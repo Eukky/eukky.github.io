@@ -1,11 +1,11 @@
 # Basic
-title: GcsSloop
+title: Eukky
 subtitle: Just do IT later.
-welcome_message: 欢迎来到我的魔法世界! 
-description: 嗨，我是 GcsSloop，一名来自2.5次元的魔法师，Android自定义View系列文章作者，非著名程序员。
+welcome_message: welcome
+description: hello world
 creator: <a href="http://www.GcsSloop.com">@GcsSloop</a>
 
-url: "http://www.gcssloop.com"
+url: "http://eukky.github.io"
 
 permalink: /:categories/:title
 
@@ -23,9 +23,9 @@ blog_button:
     description: 访问博客
 
 nav:
-    - {title: GitHub,     in_site: false,  description: GcsSloop's GitHub,    url: 'https://github.com/GcsSloop'}
+    - {title: GitHub,     in_site: false,  description: Eukky's GitHub,    url: 'https://github.com/Eukky'}
     - {title: 目录,        in_site: true,  description: 博客目录,               url: '/timeline'}
-    - {title: 关于,        in_site: true,  description: 关于作者 GcsSloop,       url: '/info/about'}
+    - {title: 关于,        in_site: true,  description: 关于作者 Eukky,       url: '/info/about'}
     
 
 
@@ -44,14 +44,14 @@ comment:
     # duoshuo:
 # Social
 social:
-    weibo: GcsSloop
-    github: GcsSloop
-    twitter: GcsSloop
+    weibo: Eukky
+    github: Eukky
+    twitter: Eukky
     rss: /feed.xml
-    mail: GcsSloop@gmail.com
+    mail: uki.sept@gmail.com
     copyright: http://choosealicense.online
 
 # Google Analytics
 ga:
     id: UA-82493667-1
-    host: www.gcssloop.com
+    host: 
