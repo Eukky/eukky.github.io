@@ -1,0 +1,7 @@
+- class_name: 网站
+  class_desc: 视频网站
+  link_list:
+    - name: Bilibili
+      link: https://www.bilibili.com/
+      avatar: https://i.loli.net/2020/05/14/9ZkGg8v3azHJfM1.png
+      descr: 视频网站
