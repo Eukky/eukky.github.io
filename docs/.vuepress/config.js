@@ -21,8 +21,8 @@ module.exports = {
             { 
                 text: 'APP开发', 
                 items: [
-                    { text: 'IOS', link: '/GameDev/IOS/' },
-                    { text: 'Android', link: '/GameDev/Android/' }
+                    { text: 'IOS', link: '/AppDev/IOS/' },
+                    { text: 'Android', link: '/AppDev/Android/' }
                 ]
             },
             { 
