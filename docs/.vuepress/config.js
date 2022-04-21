@@ -3,6 +3,12 @@ module.exports = {
     description: '一个单纯的技术分享站点',
     base: '/',
     themeConfig: {
+        lastUpdated: 'Last Updated',
+        nextLinks: true,
+        prevLinks: true,
+        editLinks: true,
+        editLinkText: '帮助我们改善此页面！',
+        sidebarDepth: 2,
         nav: [
             { text: '主页', link: '/' },
             { 
