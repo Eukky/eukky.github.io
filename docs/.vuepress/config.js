@@ -1,4 +1,15 @@
 module.exports = {
+    markdown: {
+        lineNumbers: true,
+        extendMarkdown: md => {
+            md.set({html: true})
+            md.use(require('markdown-it-texmath'), {"throwOnError" : false, "errorColor" : " #cc0000"})
+        }
+    },
+    head: [
+        ['link', { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css'}],
+        ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/github-markdown-css/2.2.1/github-markdown.css'}],
+    ],
     title: 'META TECH',
     description: '一个单纯的技术分享站点',
     base: '/',

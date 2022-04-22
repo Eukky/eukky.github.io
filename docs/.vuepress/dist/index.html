@@ -5,10 +5,24 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>META TECH</title>
     <meta name="generator" content="VuePress 1.9.7">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+    <link rel="stylesheet" href="https://gitcdn.xyz/cdn/goessner/markdown-it-texmath/master/texmath.css">
+    <script src="https://github.com/markdown-it/markdown-it/blob/master/bin/markdown-it.js"></script>
+    <script src="https://gitcdn.xyz/cdn/goessner/markdown-it-texmath/master/texmath.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+    <script>
+      const str = `"Euler\'s identity $e^{i\\pi}+1=0$ is a beautiful formula in $\\RR^2$."`
+      document.addEventListener("DOMContentLoaded", () => {
+          const md = markdownit({html:true})
+                        .use(texmath, { engine: katex,
+                                        delimiters: 'dollars',
+                                        katexOptions: { macros: {"\\RR": "\\mathbb{R}"} } } );
+          out.innerHTML = md.render(str);
+      })
+    </script>
     <meta name="description" content="一个单纯的技术分享站点">
     
-    <link rel="preload" href="/assets/css/0.styles.e4d8b86b.css" as="style"><link rel="preload" href="/assets/js/app.782b9e99.js" as="script"><link rel="preload" href="/assets/js/2.2361f5f6.js" as="script"><link rel="preload" href="/assets/js/12.c28c4693.js" as="script"><link rel="prefetch" href="/assets/js/10.2e7cb53e.js"><link rel="prefetch" href="/assets/js/11.30f36d75.js"><link rel="prefetch" href="/assets/js/3.73cc71b0.js"><link rel="prefetch" href="/assets/js/4.3dcf81a5.js"><link rel="prefetch" href="/assets/js/5.765f9924.js"><link rel="prefetch" href="/assets/js/6.c0754a73.js"><link rel="prefetch" href="/assets/js/7.4c966894.js"><link rel="prefetch" href="/assets/js/8.0c534662.js"><link rel="prefetch" href="/assets/js/9.b3344a7a.js">
+    <link rel="preload" href="/assets/css/0.styles.e4d8b86b.css" as="style"><link rel="preload" href="/assets/js/app.40cc1eeb.js" as="script"><link rel="preload" href="/assets/js/2.7395beeb.js" as="script"><link rel="preload" href="/assets/js/14.accb8a5a.js" as="script"><link rel="prefetch" href="/assets/js/10.7308ed08.js"><link rel="prefetch" href="/assets/js/11.e1c02d66.js"><link rel="prefetch" href="/assets/js/12.ae695451.js"><link rel="prefetch" href="/assets/js/13.200f270b.js"><link rel="prefetch" href="/assets/js/3.3369aca4.js"><link rel="prefetch" href="/assets/js/4.3dcf81a5.js"><link rel="prefetch" href="/assets/js/5.765f9924.js"><link rel="prefetch" href="/assets/js/6.c0754a73.js"><link rel="prefetch" href="/assets/js/7.4c966894.js"><link rel="prefetch" href="/assets/js/8.c4b3494b.js"><link rel="prefetch" href="/assets/js/9.fb33d308.js">
     <link rel="stylesheet" href="/assets/css/0.styles.e4d8b86b.css">
   </head>
   <body>
@@ -18,9 +32,9 @@
   Unity
 </a></li><li class="dropdown-item"><!----> <a href="/GameDev/UnrealEngine/" class="nav-link">
   Unreal Engine
-</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/GameDev/IOS/" class="nav-link">
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/AppDev/IOS/" class="nav-link">
   IOS
-</a></li><li class="dropdown-item"><!----> <a href="/GameDev/Android/" class="nav-link">
+</a></li><li class="dropdown-item"><!----> <a href="/AppDev/Android/" class="nav-link">
   Android
 </a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他站点" class="dropdown-title"><span class="title">其他站点</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他站点" class="mobile-dropdown-title"><span class="title">其他站点</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://discord.gg/AVeHFqCc" target="_blank" rel="noopener noreferrer" class="nav-link external">
   Discord
@@ -32,9 +46,9 @@
   Unity
 </a></li><li class="dropdown-item"><!----> <a href="/GameDev/UnrealEngine/" class="nav-link">
   Unreal Engine
-</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/GameDev/IOS/" class="nav-link">
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/AppDev/IOS/" class="nav-link">
   IOS
-</a></li><li class="dropdown-item"><!----> <a href="/GameDev/Android/" class="nav-link">
+</a></li><li class="dropdown-item"><!----> <a href="/AppDev/Android/" class="nav-link">
   Android
 </a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他站点" class="dropdown-title"><span class="title">其他站点</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他站点" class="mobile-dropdown-title"><span class="title">其他站点</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://discord.gg/AVeHFqCc" target="_blank" rel="noopener noreferrer" class="nav-link external">
   Discord
@@ -44,7 +58,10 @@
       META TECH
     </h1> <p class="description">
       一个单纯的技术分享站点
-    </p> <!----></header> <!----> <div class="theme-default-content custom content__default"><h1 id="游戏开发"><a href="#游戏开发" class="header-anchor">#</a> 游戏开发</h1> <h2 id="unity"><a href="#unity" class="header-anchor">#</a> Unity</h2> <h2 id="unreal-engine"><a href="#unreal-engine" class="header-anchor">#</a> Unreal Engine</h2> <h1 id="app开发"><a href="#app开发" class="header-anchor">#</a> APP开发</h1> <h2 id="ios"><a href="#ios" class="header-anchor">#</a> IOS</h2> <h2 id="android"><a href="#android" class="header-anchor">#</a> Android</h2></div> <div class="footer content__footer"></div></main></div><div class="global-ui"></div></div>
-    <script src="/assets/js/app.782b9e99.js" defer></script><script src="/assets/js/2.2361f5f6.js" defer></script><script src="/assets/js/12.c28c4693.js" defer></script>
+    </p> <!----></header> <!----> <div class="theme-default-content custom content__default"><h1 id="游戏开发"><a href="#游戏开发" class="header-anchor">#</a> 游戏开发</h1> <h2 id="unity"><a href="#unity" class="header-anchor">#</a> <a href="/GameDev/Unity/">Unity</a></h2> <h2 id="unreal-engine"><a href="#unreal-engine" class="header-anchor">#</a> <a href="/GameDev/UnrealEngine/">Unreal Engine</a></h2> <h1 id="app开发"><a href="#app开发" class="header-anchor">#</a> APP开发</h1> <h2 id="ios"><a href="#ios" class="header-anchor">#</a> <a href="/AppDev/IOS/">IOS</a></h2> <h2 id="android"><a href="#android" class="header-anchor">#</a> <a href="/AppDev/Android/">Android</a></h2> <p>$$ a=b_i $$
+$ a=b_i $
+$a=b_i$</p> <div class="language-math extra-class"><pre class="language-text"><code>a=b_i
+</code></pre></div><p>$a$</p></div> <div class="footer content__footer"></div></main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.40cc1eeb.js" defer></script><script src="/assets/js/2.7395beeb.js" defer></script><script src="/assets/js/14.accb8a5a.js" defer></script>
   </body>
 </html>

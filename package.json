@@ -12,5 +12,10 @@
   "license": "ISC",
   "devDependencies": {
     "vuepress": "^1.9.7"
+  },
+  "dependencies": {
+    "@neilsustc/markdown-it-katex": "^1.0.0",
+    "markdown-it-katex": "^2.0.3",
+    "markdown-it-texmath": "^0.9.7"
   }
 }
