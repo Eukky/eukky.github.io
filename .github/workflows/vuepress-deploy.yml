@@ -13,5 +13,5 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.SECRET_KEY }}
         TARGET_REPO: eukky/eukky.github.io
         TARGET_BRANCH: release
-        BUILD_SCRIPT: yarn && yarn build
+        BUILD_SCRIPT: npm && npm run docs:build
         BUILD_DIR: docs/.vuepress/dist
