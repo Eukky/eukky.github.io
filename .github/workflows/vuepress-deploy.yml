@@ -1,0 +1,17 @@
+name: Build and Deploy
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@release
+
+    - name: vuepress-deploy
+      uses: Eukky/eukky.github.io@release
+      env:
+        ACCESS_TOKEN: ${{ secrets.SECRET_KEY }}
+        TARGET_REPO: eukky/eukky.github.io
+        TARGET_BRANCH: release
+        BUILD_SCRIPT: yarn && yarn build
+        BUILD_DIR: docs/.vuepress/dist
