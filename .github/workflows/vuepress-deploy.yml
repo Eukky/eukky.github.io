@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@release
+      uses: actions/checkout@dev
 
     - name: vuepress-deploy
-      uses: Eukky/eukky.github.io@release
+      uses: Eukky/eukky.github.io@dev
       env:
         ACCESS_TOKEN: ${{ secrets.SECRET_KEY }}
         TARGET_REPO: eukky/eukky.github.io
