@@ -8,7 +8,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: vuepress-deploy
-      uses: Eukky/eukky.github.io@dev
+      uses: jenkey2011/vuepress-deploy@master
       env:
         ACCESS_TOKEN: ${{ secrets.SECRET_KEY }}
         TARGET_REPO: eukky/eukky.github.io
