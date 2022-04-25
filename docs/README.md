@@ -2,7 +2,6 @@
 home: true
 sidebar: auto
 title: Meta Tech
-sidebar: auto
 ---
 
 # 游戏开发
