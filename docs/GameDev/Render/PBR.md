@@ -8,6 +8,8 @@ tags:
   - Game Develop
   - Shadow
 editLink: true
+prev: Shadow
+next: RenderingPath
 ---
 
 # 图形开发基础（三）物理渲染与渲染方程

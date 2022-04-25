@@ -13,6 +13,7 @@ title: Meta Tech
 - [图形开发基础（一）渲染管线](./GameDev/Render/PipeLine.md)
 - [图形开发基础（二）阴影渲染](./GameDev/Render/Shadow.md)
 - [图形开发基础（三）物理渲染与渲染方程](./GameDev/Render/PBR.md)
+- [图形开发基础（四）渲染路径与常见渲染技术](./GameDev/Render/RenderingPath.md)
 
 ## [Unity](./GameDev/Unity/README.md)
 

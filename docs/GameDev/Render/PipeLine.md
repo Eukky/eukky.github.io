@@ -1,5 +1,5 @@
 ---
-title: 图形开发基础（一） 渲染管线
+title: 图形开发基础（一）渲染管线
 sidebar: auto
 categories:
   - Render
@@ -8,9 +8,11 @@ tags:
   - Game Develop
   - Shadow
 editLink: true
+prev: false
+next: Shadow
 ---
 
-# 图形开发基础（一） 渲染管线
+# 图形开发基础（一）渲染管线
 
 首先附上本文的内容结构
 

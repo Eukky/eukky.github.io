@@ -8,6 +8,8 @@ tags:
   - Game Develop
   - Shadow
 editLink: true
+prev: PipeLine
+next: PBR
 ---
 
 # 图形开发基础（二）阴影渲染
