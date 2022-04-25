@@ -1,18 +1,16 @@
 ---
-title: Render
-date: 2022-04-25
+title: 图形开发基础（一） ——— 渲染管线
 sidebar: auto
 categories:
   - Render
 tags:
   - Render
   - Game Develop
-author:
-  name: eukky
-  link: https://github.com/eukky
+  - Shadow
 editLink: true
 ---
-# 图形渲染管线
+
+# 图形开发基础（一） ——— 渲染管线
 
 首先附上本文的内容结构
 

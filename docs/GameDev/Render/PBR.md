@@ -1,18 +1,16 @@
 ---
-title: Render
-date: 2022-04-25
+title: 图形开发基础（三） ——— 物理渲染与渲染方程
 sidebar: auto
 categories:
   - Render
 tags:
   - Render
   - Game Develop
-author:
-  name: eukky
-  link: https://github.com/eukky
+  - Shadow
 editLink: true
 ---
-# 物理渲染(PBR)与渲染方程(Render Equation)
+
+# 图形开发基础（三） ——— 物理渲染(PBR)与渲染方程(Render Equation)
 
 首先附上本文内容结构
 
