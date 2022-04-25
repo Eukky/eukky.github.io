@@ -2,7 +2,7 @@
 
 首先附上本文的内容结构
 
-![unityshadows](resource/unityshadows.png)
+![unityshadows](./resource/unityshadows.png)
 
 ## 用Unity宏来实现阴影
 
@@ -55,7 +55,7 @@ fixed4 frag(v2f i) : SV_Target {
 
 最后我们只需要在Unity编辑器当中，对想要投射阴影对物体开启`Cast Shadow`选项，对接收阴影的平面开启`Receive Shadows`选项就能渲染出阴影了。效果大概长这样子
 
-![unity shadow](resource/unityshadow.png)
+![unity shadow](./resource/unityshadow.png)
 
 但仅仅是这样子的话，我自己好像啥也没有做，于是我又开始折腾，希望能够自己去生成深度贴图，自己去采样，来渲染一个完全是自己写的阴影。
 
@@ -172,9 +172,9 @@ float hardShadow(float depth, float2 uv)
 
 这里分别展示一张阴影贴图在高分辨率与低分辨率下的阴影效果图
 
-![low shadow](resource/lowshadow.png)
+![low shadow](./resource/lowshadow.png)
 
-![high shadow](resource/highshadow.png)
+![high shadow](./resource/highshadow.png)
 
 这里可以看到在低分辨率下的阴影有非常大的锯齿，效果非常不好。但是让我惊讶的是我在低分辨率的阴影贴图下各种调整光照的方向，试了好久都没有试出阴影失真的现象，这点令我非常不解。期间我尝试改变了深度贴图的存储精度，光照方向等等参数都没有试出来阴影失真应该产生的条纹。如果看到这篇文章的大佬有知道的话请一定要在下面留言告诉我。
 
@@ -205,7 +205,7 @@ float pcf(float depth, float2 uv, int filterSize)
 
 再来看看PCF之后的使用低分辨率深度贴图的阴影效果，可以看到锯齿的现象已经明显改善了许多，甚至有了软阴影的感觉。图中的效果我所取得filterSize的大小为5。
 
-![pcf shadow](resource/pcfshadow.png)
+![pcf shadow](./resource/pcfshadow.png)
 
 既然已经到了这一步，那就索性也把软阴影也实现一下吧。
 
@@ -229,7 +229,7 @@ PCSS的实现就有些许复杂起来了。根据上一篇文章所讲，PCSS的
 
 在做这一步之前，首先我们要假设把阴影贴图放在光源与阴影接收面中间的某个位置，没错就是那张图所描述的。
 
-![取自GAMES202](resource/pcss2.png)
+![取自GAMES202](./resource/pcss2.png)
 
 同时，也需要假设这个光源是一个面光源。这样就得到了一个光源Size的值。有了这两个值之后我们可以利用图中这两个相似三角形的比来计算出我们需要在shadow map中搜索blocker的范围是多少，然后计算出他们的平均深度即可。
 
@@ -298,11 +298,11 @@ float pcfSample(float depth, float2 uv, float filterSize)
 
 这样子就能实现一个基本的PCSS软阴影的效果了。调了调参数，大概就是这个效果
 
-![pcss shadow](resource/pcssshadow.png)
+![pcss shadow](./resource/pcssshadow.png)
 
 调一调参数也可以调出更夸张的阴影效果（但是总感觉不管怎么调也没有别人做的好看，之后再想办法优化优化吧）
 
-![pcss shadow](resource/pcssshadow2.png)
+![pcss shadow](./resource/pcssshadow2.png)
 
 最后就是为了解决PCSS计算量问题而出现的VSSM了。
 
@@ -396,12 +396,12 @@ float vssm(float depth, float2 uv)
 
 这是VSSM最终实现的效果
 
-![vssm shadow](resource/vssmshadow.png)
+![vssm shadow](./resource/vssmshadow.png)
 
 需要注意的是，进行VSSM深度贴图计算的时候，需要把生成纹理的格式更改为`RGFLOAT`从而获得更高的精度，否则在计算深度平方的时候会因为精度问题而导致误差，这个误差在进行方差计算的时候会有非常大的影响。这个问题困扰了非常久，当时也猜到了是精度问题，但是没想到最后的解决方式是修改了纹理格式。
 
 这里也放上以上错误的效果示范
 
-![vssm shadow error](resource/vssmshadowerror.png)
+![vssm shadow error](./resource/vssmshadowerror.png)
 
 以上就是在实现各种阴影的过程中陆陆续续踩的一些坑了，花了不少时间（虽然中间大部分时间都跑去狩猎了）。代码我会上传到github，有兴趣的朋友可以自取，当然，如果发现其中有一些算法或者实现上的错误能够告诉我的话也是再好不过，毕竟本人Unity萌新以及图形学萌新。

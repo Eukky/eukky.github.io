@@ -19,7 +19,7 @@ editLink: true
 
 首先附上本文的内容结构
 
-![shadow](resource/shadow.png)
+![shadow](./resource/shadow.png)
 
 ## Shadow Map
 
@@ -31,7 +31,7 @@ editLink: true
 
 然而使用这种方法计算出来的阴影由于分辨率的限制会出现阴影失真的问题，形成原因如图所示：
 
-![取自LearnOpengl](resource/sm.png)
+![取自LearnOpengl](./resource/sm.png)
 
 在阴影贴图分辨率比较低的情况下，深度会被认为是以这种阶梯状的形式存在，每一个斜坡代表深度贴图的一个纹理像素，因此在光源方向与接受面的角度非常小的时候，会出现非常大的阴影失真现象。为了改善这种情况，可以在计算阴影时加上一个适当的偏移来保证在一定的深度差范围内，都认为是被阴影遮挡的状态。如此一来则又会产生一个另外的问题，也就是阴影会偏离实际的物体，造成一种悬浮的现象。
 
@@ -59,7 +59,7 @@ PCF是一种多个不通过滤方式的组合，来使阴影变得更加柔和�
 
 那么如何求出filter的大小呢，基本思路如下图（取自GAMES202_Lecture_03）所示：
 
-![取自GAMES202](resource/pcss1.png)
+![取自GAMES202](./resource/pcss1.png)
 
 $$ w_{Penumbra} = (d_{Receiver} - d_{Blocker}) \cdot w_{wight} / d_{Blocker} $$
 
@@ -87,7 +87,7 @@ $$ w_{Penumbra} = (d_{Receiver} - d_{Blocker}) \cdot w_{wight} / d_{Blocker} $$
 
 第二种则是在光源的视锥体中，先把阴影贴图放在视锥体的某一个位置，从像素点到光源之间做连线，连线在阴影贴图中截取的区域便是需要做平均值计算的区域。如下图（取自GAMES202_Lecture_03）所示：
 
-![取自GAMES202](resource/pcss2.png)
+![取自GAMES202](./resource/pcss2.png)
 
 如此一来，若阴影贴图越靠近光源，则在阴影贴图上的查询范围则越大，阴影贴图越远离光源，在阴影贴图上的查询范围则越小。通过这种方式来获取最开始的平均深度的查询范围，从而进行平均深度的计算。
 
@@ -125,7 +125,7 @@ $$ P(X > t) \leq \frac{\sigma^2}{\sigma^2 + (t - \mu)^2} $$
 
 假设现在取到了一个5*5的区域，如图取自（GAMES202_Lecture_04）所示：
 
-![取自GAMES202](resource/vssm1.png)
+![取自GAMES202](./resource/vssm1.png)
 
 首先我们需要求的并不是这个区域内的所有值的平均，而是被遮挡物的深度的平均值，也就是blocker的深度的均值。也就是途中蓝色部分。这里我们把红色部分与蓝色部分的均值分开进行看待。
 
@@ -153,7 +153,7 @@ VSSM存储了深度X与X平方的两个贴图，也就是使用了二阶矩来�
 
 下面是一个结论，前m阶矩能够近似代表一个有m/2个台阶的函数。如下图（取自GAMES202_Lecture_04）所示：
 
-![取自GAMES202](resource/msm.png)
+![取自GAMES202](./resource/msm.png)
 
 图中绿色的线表示使用4阶矩进行描述的CDF，通常使用4阶矩便已经能够取得非常不错的效果。
 
