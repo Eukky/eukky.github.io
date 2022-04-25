@@ -1,5 +1,5 @@
 ---
-title: Unity阴影渲染实现（四）——— PCSS软阴影
+title: Unity阴影渲染实现（四）PCSS软阴影
 sidebar: false
 categories:
   - Unity
@@ -12,7 +12,7 @@ prev: UnityShadow3
 next: UnityShadow5
 ---
 
-# Unity阴影渲染实现（四）——— PCSS软阴影
+# Unity阴影渲染实现（四）PCSS软阴影
 
 这篇我们来实现PCSS软阴影。PCSS的实现就有些许复杂起来了。计算过程一共分为三个部分：
 

@@ -1,5 +1,5 @@
 ---
-title: Unity阴影渲染实现（二）——— Unity自定义阴影
+title: Unity阴影渲染实现（二）Unity自定义阴影
 sidebar: false
 categories:
   - Unity
@@ -12,7 +12,7 @@ prev: UnityShadow1
 next: UnityShadow3
 ---
 
-# Unity阴影渲染实现（二）——— Unity自定义阴影
+# Unity阴影渲染实现（二）Unity自定义阴影
 
 这篇我们不借助Unity宏，来写一个自定义的阴影。没有了Unity宏的帮助，首先必须自己生成一张深度贴图。要生成一张深度贴图，大概分为以下几步：
 

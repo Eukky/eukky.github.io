@@ -1,5 +1,5 @@
 ---
-title: 图形开发基础（三） ——— 物理渲染与渲染方程
+title: 图形开发基础（三）物理渲染与渲染方程
 sidebar: auto
 categories:
   - Render
@@ -10,7 +10,7 @@ tags:
 editLink: true
 ---
 
-# 图形开发基础（三） ——— 物理渲染(PBR)与渲染方程(Render Equation)
+# 图形开发基础（三）物理渲染与渲染方程
 
 首先附上本文内容结构
 

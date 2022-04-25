@@ -1,5 +1,5 @@
 ---
-title: Unity阴影渲染实现（五）——— VSSM软阴影
+title: Unity阴影渲染实现（五）VSSM软阴影
 sidebar: false
 categories:
   - Unity
@@ -12,7 +12,7 @@ prev: UnityShadow4
 next: false
 ---
 
-# Unity阴影渲染实现（五）——— VSSM软阴影
+# Unity阴影渲染实现（五）VSSM软阴影
 
 这篇我们来实现为了优化PCSS的计算量而诞生的VSSM，VSSM实现的关键在于在阴影贴图中需要同时存储深度以及深度的平方，这就需要我们对计算深度贴图的着色器进行更改。改法也很简单，直接把这两个值输出就好了。不过我在这边是直接存了深度的4次方。
 

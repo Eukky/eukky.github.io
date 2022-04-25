@@ -1,5 +1,5 @@
 ---
-title: 图形开发基础（二） ——— 阴影渲染
+title: 图形开发基础（二）阴影渲染
 sidebar: auto
 categories:
   - Render
@@ -10,7 +10,7 @@ tags:
 editLink: true
 ---
 
-# 图形开发基础（二） ——— 阴影渲染
+# 图形开发基础（二）阴影渲染
 
 首先附上本文的内容结构
 

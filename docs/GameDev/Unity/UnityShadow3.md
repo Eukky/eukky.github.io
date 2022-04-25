@@ -1,5 +1,5 @@
 ---
-title: Unity阴影渲染实现（三）——— PCF软阴影
+title: Unity阴影渲染实现（三）PCF软阴影
 sidebar: false
 categories:
   - Unity
@@ -12,7 +12,7 @@ prev: UnityShadow2
 next: UnityShadow4
 ---
 
-# Unity阴影渲染实现（三）——— PCF软阴影
+# Unity阴影渲染实现（三）PCF软阴影
 
 紧接上一篇，这篇我们来实现PCF阴影解决锯齿问题。这里我所使用的pcf非常简单，就是直接根据filterSize的大小进行一个均值滤波。由于原理非常简单就直接上代码吧。
 

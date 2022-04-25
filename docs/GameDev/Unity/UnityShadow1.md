@@ -1,5 +1,5 @@
 ---
-title: Unity阴影渲染实现（一）--Unity宏阴影
+title: Unity阴影渲染实现（一）Unity宏阴影
 sidebar: false
 categories:
   - Unity
@@ -12,7 +12,7 @@ prev: false
 next: UnityShadow2
 ---
 
-# Unity阴影渲染实现（一）--Unity宏阴影
+# Unity阴影渲染实现（一）Unity宏阴影
 
 这段时间使用Unity把阴影自己尝试着实现了一下。原理讲起来不难，但是在实现过程中还是踩了不少的坑。下面就让我把这段时间遇到的坑以及整个实现的过程都记录一下。本来是打算用最近在写的一个Vulkan渲染器去实现的，结果由于进度太慢连RHI都还没有封装完，想了想还是先用Unity搞一下好了。果然学习还是要一步一步慢慢来。那废话也不多说了，就开始吧。
 
