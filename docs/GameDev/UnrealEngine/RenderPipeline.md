@@ -129,11 +129,357 @@ if (ShouldRenderSkyAtmosphere(Scene, ActiveViewFamily->EngineShowFlags) && !bPat
     Scene->ResetAtmosphereLightsProperties();
 }
 
-// Multi GPU相关设置
+//Multi GPU相关设置
 #if WITH_MGPU
 const FRHIGPUMask RenderTargetGPUMask = ComputeGPUMasks(GraphBuilder.RHICmdList);
 #endif
 
 //等待遮挡测试
 WaitOcclusionTests(GraphBuilder.RHICmdList);
+```
+
+### 场景渲染
+
+从这里开始，RDG的宏能够为我们分析这段代码提供不少帮助。依旧还是从上到下，我们按顺序去看每一段代码都在做什么。为了方便快速检索代码，下边也会把源码给贴出来。
+
+- 给RT分配内存
+
+```cpp
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_Render_Init);
+RDG_RHI_GPU_STAT_SCOPE(GraphBuilder, AllocateRendertargets);
+
+// Initialize global system textures (pass-through if already initialized).
+GSystemTextures.InitializeTextures(GraphBuilder.RHICmdList, FeatureLevel);
+
+// Force the subsurface profile texture to be updated.
+UpdateSubsurfaceProfileTexture(GraphBuilder, ShaderPlatform);
+
+// Force the rect light texture to be updated.
+RectLightAtlas::UpdateRectLightAtlasTexture(GraphBuilder, FeatureLevel);
+```
+
+- 更新VT
+
+```cpp
+RDG_GPU_STAT_SCOPE(GraphBuilder, VirtualTextureUpdate);
+// AllocateResources needs to be called before RHIBeginScene
+FVirtualTextureSystem::Get().AllocateResources(GraphBuilder, FeatureLevel);
+FVirtualTextureSystem::Get().CallPendingCallbacks();
+VirtualTextureFeedbackBegin(GraphBuilder, Views, SceneTexturesConfig.Extent);
+```
+
+- 初始化可见性
+
+```cpp
+RDG_GPU_STAT_SCOPE(GraphBuilder, VisibilityCommands);
+InitViews(GraphBuilder, SceneTexturesConfig, BasePassDepthStencilAccess, ILCTaskData, InstanceCullingManager);
+```
+
+- 为UniformBufferExtension准备视图
+
+```cpp
+for (IPersistentViewUniformBufferExtension* Extension : PersistentViewUniformBufferExtensions) {
+    Extension->BeginFrame();
+    for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++) {
+        Extension->PrepareView(&Views[ViewIndex]);
+    }
+}
+```
+
+- 为使用路径追踪进行渲染准备资源
+
+```cpp
+// Gather mesh instances, shaders, resources, parameters, etc. and build ray tracing acceleration structure
+FRayTracingScene& RayTracingScene = Scene->RayTracingScene;
+RayTracingScene.Reset();
+
+const int32 ReferenceViewIndex = 0;
+FViewInfo& ReferenceView = Views[ReferenceViewIndex];
+
+// Prepare the scene for rendering this frame.
+GatherRayTracingWorldInstancesForView(GraphBuilder, ReferenceView, RayTracingScene);
+```
+
+- 提交动态VB
+
+```cpp
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_FGlobalDynamicVertexBuffer_Commit);
+DynamicIndexBufferForInitViews.Commit();
+DynamicVertexBufferForInitViews.Commit();
+DynamicReadBufferForInitViews.Commit();
+```
+
+- 特效的预渲染，包括GPU粒子模拟等
+
+```cpp
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_FXSystem_PreRender);
+GraphBuilder.SetCommandListStat(GET_STATID(STAT_CLM_FXPreRender));
+FXSystem->PreRender(GraphBuilder, Views, true /*bAllowGPUParticleUpdate*/);
+if (FGPUSortManager* GPUSortManager = FXSystem->GetGPUSortManager()) {
+    GPUSortManager->OnPreRender(GraphBuilder);
+}
+```
+
+- 场景GPU资源的更新，包括Instance数据的更新和剔除，物理场的更新等
+
+```cpp
+RDG_GPU_STAT_SCOPE(GraphBuilder, GPUSceneUpdate);
+Scene->GPUScene.Update(GraphBuilder, *Scene);
+Scene->UpdatePhysicsField(GraphBuilder, View);
+```
+
+- 再一次更新VT，与上一次不同的是，上一次VT的更新主要还是处理资源的分配，这里是真正的对VT数据进行更新。
+
+```cpp
+RDG_GPU_STAT_SCOPE(GraphBuilder, VirtualTextureUpdate);
+FVirtualTextureSystem::Get().Update(GraphBuilder, FeatureLevel, Scene);
+```
+
+- 判断是否进行光源剔除
+
+```cpp
+if (!IsSimpleForwardShadingEnabled(ShaderPlatform)) {
+    bComputeLightGrid |= (
+        ShouldRenderVolumetricFog() ||
+        VolumetricCloudWantsToSampleLocalLights(Scene, ActiveViewFamily->EngineShowFlags) ||
+        ActiveViewFamily->ViewMode != VMI_Lit ||
+        bAnyLumenEnabled ||
+        ActiveViewFamily->VirtualShadowMapArray.IsEnabled());
+}
+```
+
+- 判断是否进行遮挡剔除与深度测试
+
+```cpp
+const bool bIsOcclusionTesting = DoOcclusionQueries() && !ActiveViewFamily->EngineShowFlags.DisableOcclusionQueries
+    && (!ActiveViewFamily->EngineShowFlags.Wireframe || bIsViewFrozen || bHasViewParent);
+const bool bNeedsPrePass = ShouldRenderPrePass();
+```
+
+- 绘制深度
+
+```cpp
+if (DepthPass.IsComputeStencilDitherEnabled()) {
+    AddDitheredStencilFillPass(GraphBuilder, Views, SceneTextures.Depth.Target, DepthPass);
+}
+```
+
+- 发丝相关的计算
+
+```cpp
+if (IsHairStrandsEnabled(EHairStrandsShaderType::All, Scene->GetShaderPlatform())) {
+    if (bRunHairStrands) {
+        RunHairStrandsBookmark(GraphBuilder, EHairStrandsBookmark::ProcessStrandsInterpolation, HairStrandsBookmarkParameters);
+    } else {
+        for (FViewInfo& View : Views) {
+            View.HairStrandsViewData.UniformBuffer = HairStrands::CreateDefaultHairStrandsViewUniformBuffer(GraphBuilder, View);
+        }
+    }
+}
+```
+
+- 更新Nanite Streaming
+
+```cpp
+if (bUpdateNaniteStreaming) {
+    Nanite::GStreamingManager.EndAsyncUpdate(GraphBuilder);
+}
+```
+
+- 距离场的计算
+
+```cpp
+RDG_RHI_GPU_STAT_SCOPE(GraphBuilder, GPUSceneUpdate);
+PrepareDistanceFieldScene(GraphBuilder, false);
+```
+
+- Prepass深度剔除
+
+```cpp
+GraphBuilder.SetCommandListStat(GET_STATID(STAT_CLM_PrePass));
+if (bNeedsPrePass) {
+    RenderPrePass(GraphBuilder, SceneTextures.Depth.Target, InstanceCullingManager);
+} else {
+    // We didn't do the prepass, but we still want the HMD mask if there is one
+    RenderPrePassHMD(GraphBuilder, SceneTextures.Depth.Target);
+}
+```
+- Lumen相关的可见性计算与动态VB设置，在InitViewsAfterPrepass()函数中主要进行动态阴影初始化，反射探针Buffer设置等。
+
+```cpp
+FLumenSceneFrameTemporaries LumenFrameTemporaries;
+
+RDG_RHI_GPU_STAT_SCOPE(GraphBuilder, VisibilityCommands);
+InitViewsAfterPrepass(GraphBuilder, LumenFrameTemporaries, ILCTaskData, InstanceCullingManager);
+
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_FGlobalDynamicVertexBuffer_Commit);
+DynamicVertexBufferForInitShadows.Commit();
+DynamicIndexBufferForInitShadows.Commit();
+DynamicReadBufferForInitShadows.Commit();
+```
+
+- Nanite光栅化与剔除
+
+```cpp
+Nanite::CullRasterize(
+    GraphBuilder,
+    Scene->NaniteRasterPipelines[ENaniteMeshPass::BasePass],
+    *Scene,
+    View,
+    { PackedView },
+    SharedContext,
+    CullingContext,
+    RasterContext,
+    RasterState,
+    /*OptionalInstanceDraws*/ nullptr,
+    bExtractStats
+);
+```
+
+- Resolve Depth，这个Pass只会在启用MSAA的情况下执行
+
+```cpp
+AddResolveSceneDepthPass(GraphBuilder, Views, SceneTextures.Depth);
+```
+
+- 光源排序，遮挡剔除，与剔除后的光照计算
+
+```cpp
+RDG_GPU_STAT_SCOPE(GraphBuilder, SortLights);
+GatherLightsAndComputeLightGrid(GraphBuilder, bComputeLightGrid, SortedLightSet);
+
+RenderOcclusion(GraphBuilder, SceneTextures, bIsOcclusionTesting);
+
+CompositionLighting.ProcessAfterOcclusion(GraphBuilder);
+```
+
+- 距离场阴影投影计算
+
+```cpp
+BeginAsyncDistanceFieldShadowProjections(GraphBuilder, SceneTextures);
+```
+
+- 体积云，天空大气与实时环境反射的计算
+
+```cpp
+InitVolumetricRenderTargetForViews(GraphBuilder, Views);
+
+InitVolumetricCloudsForViews(GraphBuilder, bShouldRenderVolumetricCloudBase, InstanceCullingManager);
+
+RenderSkyAtmosphereLookUpTables(GraphBuilder);
+
+Scene->AllocateAndCaptureFrameSkyEnvMap(GraphBuilder, *this, MainView, bShouldRenderSkyAtmosphere, bShouldRenderVolumetricCloud, InstanceCullingManager);
+```
+
+- 自定义深度计算
+
+```cpp
+RenderCustomDepthPass(GraphBuilder, SceneTextures.CustomDepth, SceneTextures.GetSceneTextureShaderParameters(FeatureLevel));
+```
+
+- Lumen场景更新，主要包括光照贴图的渲染等
+
+```cpp
+UpdateLumenScene(GraphBuilder, LumenFrameTemporaries);
+```
+
+- 在前向渲染的情况下，渲染阴影深度，头发，以及阴影投影，以及体积雾
+
+```cpp
+if (IsForwardShadingEnabled(ShaderPlatform)) {
+    RenderShadowDepthMaps(GraphBuilder, InstanceCullingManager);
+
+    if (bHairStrandsEnable && !bHasRayTracedOverlay) {
+        RenderHairPrePass(GraphBuilder, Scene, Views, InstanceCullingManager);
+        RenderHairBasePass(GraphBuilder, Scene, SceneTextures, Views, InstanceCullingManager);
+    }
+
+    RenderForwardShadowProjections(GraphBuilder, SceneTextures, ForwardScreenSpaceShadowMaskTexture, ForwardScreenSpaceShadowMaskHairTexture);
+
+    ComputeVolumetricFog(GraphBuilder, SceneTextures);
+}
+```
+
+- DBuffer相关的处理，主要包括DBuffer贴花的计算与SSAO
+
+```cpp
+CompositionLighting.ProcessBeforeBasePass(GraphBuilder, DBufferTextures);
+```
+
+- 前向渲染的情况下，IndirectCapsuleShadows的绘制
+
+```cpp
+if (IsForwardShadingEnabled(ShaderPlatform) && bAllowStaticLighting){
+    RenderIndirectCapsuleShadows(GraphBuilder, SceneTextures);
+}
+```
+
+- BasePass，场景中物件的渲染，主要绘制各物件的GBuffer
+
+```cpp
+RenderBasePass(GraphBuilder, SceneTextures, DBufferTextures, BasePassDepthStencilAccess, ForwardScreenSpaceShadowMaskTexture, InstanceCullingManager, bNaniteEnabled, NaniteRasterResults);
+```
+
+- Nanite可视化
+
+```cpp
+Nanite::AddVisualizationPasses(
+    GraphBuilder,
+    Scene,
+    SceneTextures,
+    ActiveViewFamily->EngineShowFlags,
+    Views,
+    NaniteRasterResults
+);
+```
+
+- 实时天空球捕获
+
+```cpp
+if (bRealTimeSkyCaptureEnabled){
+    Scene->ValidateSkyLightRealTimeCapture(GraphBuilder, Views[0], SceneTextures.Color.Target);
+}
+```
+
+- 体积光可视化
+
+```cpp
+VisualizeVolumetricLightmap(GraphBuilder, SceneTextures);
+```
+
+- 如果在BasePass之前没有做遮挡剔除与光照计算，则在这里做
+
+```cpp
+if (!bOcclusionBeforeBasePass) {
+    RenderOcclusionLambda();
+}
+```
+
+- Resolve Scene Color，同样只在MSAA开启的情况下进行
+
+```cpp
+AddResolveSceneColorPass(GraphBuilder, Views, SceneTextures.Color);
+```
+
+- 如果是非前向渲染，则头发的渲染在这里进行
+
+```cpp
+if (bHairStrandsEnable && !IsForwardShadingEnabled(ShaderPlatform) && !bHasRayTracedOverlay) {
+    RenderHairPrePass(GraphBuilder, Scene, Views, InstanceCullingManager);
+    RenderHairBasePass(GraphBuilder, Scene, SceneTextures, Views, InstanceCullingManager);
+}
+```
+
+- BasePass之后的阴影深度，Lumen光照以及体积雾计算
+
+```cpp
+RenderShadowDepthMaps(GraphBuilder, InstanceCullingManager);
+RenderLumenSceneLighting(GraphBuilder, LumenFrameTemporaries);
+ComputeVolumetricFog(GraphBuilder, SceneTextures);
+```
+
+- Nanite Streaming请求递交
+
+```cpp
+Nanite::GStreamingManager.SubmitFrameStreamingRequests(GraphBuilder);
 ```
