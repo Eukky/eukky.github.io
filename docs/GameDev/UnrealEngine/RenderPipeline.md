@@ -20,6 +20,8 @@ next: false
 
 ## RenderDoc寻找入口
 
+这里使用的是ue5-main分支。
+
 随便新建一个空项目，在插件中打开RenderDoc插件，点击右上角的截帧按钮截帧，没几秒就截出来了。先来看看这一帧当中，UE都做了些啥事。下图是筛选了draw关键字之后的结果。
 
 ![RenderDocPass](./resource/RenderDocPass.png)
@@ -359,7 +361,7 @@ CompositionLighting.ProcessAfterOcclusion(GraphBuilder);
 BeginAsyncDistanceFieldShadowProjections(GraphBuilder, SceneTextures);
 ```
 
-- 体积云，天空大气与实时环境反射的计算
+- 体积云，天空大气与实时环境反射相关初始化
 
 ```cpp
 InitVolumetricRenderTargetForViews(GraphBuilder, Views);
@@ -483,3 +485,212 @@ ComputeVolumetricFog(GraphBuilder, SceneTextures);
 ```cpp
 Nanite::GStreamingManager.SubmitFrameStreamingRequests(GraphBuilder);
 ```
+
+- BasePass之后的Custom Depth绘制
+
+```cpp
+if (CustomDepthPassLocation == ECustomDepthPassLocation::AfterBasePass) {
+    RenderCustomDepthPass(GraphBuilder, SceneTextures.CustomDepth, SceneTextures.GetSceneTextureShaderParameters(FeatureLevel));
+}
+```
+
+- Velocity的渲染
+
+```cpp
+RenderVelocities(GraphBuilder, SceneTextures, EVelocityPass::Opaque, bHairStrandsEnable);
+```
+
+- 延迟渲染的光照合成，贴花，以及SSAO
+
+```cpp
+CSV_SCOPED_TIMING_STAT_EXCLUSIVE(AfterBasePass);
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_AfterBasePass);
+
+if (!IsForwardShadingEnabled(ShaderPlatform)) {
+    AddResolveSceneDepthPass(GraphBuilder, Views, SceneTextures.Depth);
+}
+
+CompositionLighting.ProcessAfterBasePass(GraphBuilder);
+```
+
+- 等待路径追踪的光照计算
+
+```cpp
+WaitForRayTracingScene(GraphBuilder, DynamicGeometryScratchBuffer);
+```
+
+- Lumen光照计算，包括间接光照，AO，天空光，发丝次表面散射等计算
+
+```cpp
+RDG_GPU_STAT_SCOPE(GraphBuilder, RenderDeferredLighting);
+RDG_CSV_STAT_EXCLUSIVE_SCOPE(GraphBuilder, RenderLighting);
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_Lighting);
+
+BeginGatheringLumenSurfaceCacheFeedback(GraphBuilder, Views[0], LumenFrameTemporaries);
+RenderDiffuseIndirectAndAmbientOcclusion(GraphBuilder, SceneTextures, LumenFrameTemporaries, LightingChannelsTexture, /* bIsVisualizePass = */ false);
+RenderIndirectCapsuleShadows(GraphBuilder, SceneTextures);
+RenderDFAOAsIndirectShadowing(GraphBuilder, SceneTextures, DynamicBentNormalAOTexture);
+RenderLights(GraphBuilder, SceneTextures, TranslucencyLightingVolumeTextures, LightingChannelsTexture, SortedLightSet);
+RenderDeferredReflectionsAndSkyLighting(GraphBuilder, SceneTextures, DynamicBentNormalAOTexture);
+RenderGlobalIlluminationPluginVisualizations(GraphBuilder, LightingChannelsTexture);
+AddSubsurfacePass(GraphBuilder, SceneTextures, Views);
+RenderHairStrandsSceneColorScattering(GraphBuilder, SceneTextures.Color.Target, Scene, Views);
+```
+
+- 环境的渲染，包括光束的渲染，大气的渲染，雾的渲染以及体积云的渲染
+
+```cpp
+// Draw Lightshafts
+if (!bHasRayTracedOverlay && ActiveViewFamily->EngineShowFlags.LightShafts)
+{
+    SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_RenderLightShaftOcclusion);
+    LightShaftOcclusionTexture = RenderLightShaftOcclusion(GraphBuilder, SceneTextures);
+}
+
+// Draw the sky atmosphere
+if (!bHasRayTracedOverlay && bShouldRenderSkyAtmosphere)
+{
+    SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_RenderSkyAtmosphere);
+    RenderSkyAtmosphere(GraphBuilder, SceneTextures);
+}
+
+// Draw fog.
+if (!bHasRayTracedOverlay && ShouldRenderFog(*ActiveViewFamily))
+{
+    RDG_CSV_STAT_EXCLUSIVE_SCOPE(GraphBuilder, RenderFog);
+    SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_RenderFog);
+    RenderFog(GraphBuilder, SceneTextures, LightShaftOcclusionTexture);
+}
+
+// After the height fog, Draw volumetric clouds (having fog applied on them already) when using per pixel tracing,
+if (!bHasRayTracedOverlay && bShouldRenderVolumetricCloud)
+{
+    bool bSkipVolumetricRenderTarget = true;
+    bool bSkipPerPixelTracing = false;
+    RenderVolumetricCloud(GraphBuilder, SceneTextures, bSkipVolumetricRenderTarget, bSkipPerPixelTracing, HalfResolutionDepthCheckerboardMinMaxTexture, false, InstanceCullingManager);
+}
+```
+
+- 不透明特效的渲染
+
+```cpp
+RenderOpaqueFX(GraphBuilder, Views, FXSystem, SceneTextures.UniformBuffer);
+```
+
+- 透明Pass之前，发丝的合成
+
+```cpp
+if (GetHairStrandsComposition() == EHairStrandsCompositionType::BeforeTranslucent) {
+    RDG_GPU_STAT_SCOPE(GraphBuilder, HairRendering);
+    RenderHairComposition(GraphBuilder, Views, SceneTextures.Color.Target, SceneTextures.Depth.Target);
+}
+```
+
+- 透明Pass
+
+```cpp
+RDG_EVENT_SCOPE(GraphBuilder, "Translucency");
+RenderTranslucency(GraphBuilder, SceneTextures, TranslucencyLightingVolumeTextures, &TranslucencyResourceMap, TranslucencyViewsToRender, InstanceCullingManager);
+```
+
+- 透明Pass之后，发丝的合成
+
+```cpp
+if (GetHairStrandsComposition() == EHairStrandsCompositionType::AfterTranslucent) {
+    RDG_GPU_STAT_SCOPE(GraphBuilder, HairRendering);
+    RenderHairComposition(GraphBuilder, Views, SceneTextures.Color.Target, SceneTextures.Depth.Target);
+}
+```
+
+- Distortion的渲染
+
+```cpp
+GraphBuilder.SetCommandListStat(GET_STATID(STAT_CLM_Distortion));
+RenderDistortion(GraphBuilder, SceneTextures.Color.Target, SceneTextures.Depth.Target);
+```
+
+- 透明物体的Velosity渲染
+
+```cpp
+GraphBuilder.SetCommandListStat(GET_STATID(STAT_CLM_TranslucentVelocity));
+RenderVelocities(GraphBuilder, SceneTextures, EVelocityPass::Translucent, false);
+```
+
+- Shader Debug信息的绘制
+
+```cpp
+for (FViewInfo& View : Views) {
+    ShadingEnergyConservation::Debug(GraphBuilder, View, SceneTextures);
+}
+```
+
+- 光线Bloom的渲染
+
+```cpp
+SCOPE_CYCLE_COUNTER(STAT_FDeferredShadingSceneRenderer_RenderLightShaftBloom);
+GraphBuilder.SetCommandListStat(GET_STATID(STAT_CLM_LightShaftBloom));
+RenderLightShaftBloom(GraphBuilder, SceneTextures, /* inout */ TranslucencyResourceMap);
+```
+
+- 路径追踪以及路径追踪的Debug信息
+
+```cpp
+RenderPathTracing(GraphBuilder, View, SceneTextures.UniformBuffer, SceneTextures.Color.Target);
+RenderRayTracingDebug(GraphBuilder, View, SceneTextures.Color.Target);
+```
+
+- 物理场渲染
+
+```cpp
+RenderPhysicsField(GraphBuilder, Views, Scene->PhysicsField, SceneTextures.Color.Target);
+```
+
+- 距离场光照渲染
+
+```cpp
+RenderDistanceFieldLighting(GraphBuilder, SceneTextures, FDistanceFieldAOParameters(OcclusionMaxDistance), DummyOutput, false, ActiveViewFamily->EngineShowFlags.VisualizeDistanceFieldAO);
+```
+
+- 网格距离场可视化
+
+```cpp
+RenderMeshDistanceFieldVisualization(GraphBuilder, SceneTextures, FDistanceFieldAOParameters(Scene->DefaultMaxDistanceFieldOcclusionDistance));
+```
+
+- 间接光AO
+
+```cpp
+RenderLumenMiscVisualizations(GraphBuilder, SceneTextures, LumenFrameTemporaries);
+RenderDiffuseIndirectAndAmbientOcclusion(GraphBuilder, SceneTextures, LumenFrameTemporaries, LightingChannelsTexture, /* bIsVisualizePass = */ true);
+```
+
+- 重叠光源渲染
+
+```cpp
+RenderStationaryLightOverlap(GraphBuilder, SceneTextures, LightingChannelsTexture);
+```
+
+- 后处理
+
+```cpp
+RDG_EVENT_SCOPE(GraphBuilder, "PostProcessing");
+RDG_GPU_STAT_SCOPE(GraphBuilder, Postprocessing);
+AddPostProcessingPasses(GraphBuilder, View, ViewIndex, bAnyLumenActive, PostProcessingInputs, NaniteResults, InstanceCullingManager, &ActiveViewFamily->VirtualShadowMapArray, LumenFrameTemporaries);
+```
+
+到这里整个场景的渲染基本上就算是结束了，可以发现这个函数里面包含了非常多的逻辑，有些渲染根据配置不同前前后后反复出现，例如Depth贴图的绘制等等，根据是否开启PreZ，是否是前向渲染还是延迟渲染，都会被放到不同的地方去执行，上面对整个函数逻辑的摘抄只为了解个大概，毕竟每一个阶段的调用函数进去之后，又是一个个可以深入研究的话题。
+
+同时，把关键代码摘抄出来，也方便日后进行某一个模块开发的时候直接对源码位置进行一个定位，不过这就是后面的话题了。
+
+不过总的来说，整个渲染流程中调用的东西可以分为这几个模块
+
+- 延迟管线的绘制
+- 前向管线的绘制
+- 路径追踪管线的渲染
+- Lumen的配置与渲染
+- Nanite的配置与渲染
+- 场景环境光照（天空，大气，云）的配置与渲染
+
+对整个渲染流程的粗略一看，免不了会有错误和疏漏，但是也不要紧，看完之后还是能够知道UE5在渲染中大概去做了哪些事情。出了这个延迟渲染管线，UE5中还包含一个Mobile管线，这里就不作分析了。
+
+另外，对于是否要把使用RenderDoc寻找源码的切入点给写出来，其实纠结了蛮久，最终还是打算写一下。我相信还是有不少朋友在最开始想要学习UE源码时在茫茫代码中不知从哪里去找自己想看的那部分，也不知道如何上手。这里就当作是给像我一样不知道从哪儿开始的朋友们做个参考。
