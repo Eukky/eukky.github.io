@@ -35,3 +35,7 @@ title: Meta Tech
 ## [IOS](./AppDev/IOS/README.md)
 
 ## [Android](./AppDev/Android/README.md)
+
+# 杂谈
+
+- [怎样算一个好的技术团队](./Others/Team.md)
