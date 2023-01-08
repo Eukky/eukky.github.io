@@ -208,11 +208,9 @@ case MP_SubsurfaceColor:
     Active = ShadingModels.HasAnyShadingModel({ MSM_Subsurface, MSM_PreintegratedSkin, MSM_TwoSidedFoliage, MSM_Cloth });
     break;
 case MP_CustomData0:
-    // EK Toon
     Active = ShadingModels.HasAnyShadingModel({ MSM_ClearCoat, MSM_Hair, MSM_Cloth, MSM_Eye, MSM_SubsurfaceProfile, MSM_Toon });
     break;
 case MP_CustomData1:
-    // EK Toon
     Active = ShadingModels.HasAnyShadingModel({ MSM_ClearCoat, MSM_Eye, MSM_Toon });
     break;
 ```
@@ -262,7 +260,6 @@ if (Mat.MATERIAL_SHADINGMODEL_SINGLELAYERWATER)
 if (Mat.MATERIAL_SHADINGMODEL_THIN_TRANSLUCENT)
 {
 }
-// EK Toon
 if (Mat.MATERIAL_SHADINGMODEL_TOON)
 {
     SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
@@ -277,7 +274,6 @@ Dst.NEEDS_LIGHTMAP = (Dst.NEEDS_LIGHTMAP_COORDINATE) && !Lightmap.PRECOMPUTED_IR
 Dst.USES_GBUFFER = (FEATURE_LEVEL >= ERHIFeatureLevel::SM4_REMOVED && (Mat.MATERIALBLENDING_SOLID || Mat.MATERIALBLENDING_MASKED) && !SrcGlobal.FORWARD_SHADING);
 
 // Only some shader models actually need custom data.
-// EK Toon
 Dst.WRITES_CUSTOMDATA_TO_GBUFFER = (Dst.USES_GBUFFER && (Mat.MATERIAL_SHADINGMODEL_SUBSURFACE || Mat.MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN || Mat.MATERIAL_SHADINGMODEL_SUBSURFACE_PROFILE || Mat.MATERIAL_SHADINGMODEL_CLEAR_COAT || Mat.MATERIAL_SHADINGMODEL_TWOSIDED_FOLIAGE || Mat.MATERIAL_SHADINGMODEL_HAIR || Mat.MATERIAL_SHADINGMODEL_CLOTH || Mat.MATERIAL_SHADINGMODEL_EYE || Mat.MATERIAL_SHADINGMODEL_TOON));
 ```
 
@@ -525,7 +521,6 @@ FDirectLighting IntegrateBxDF( FGBufferData GBuffer, half3 N, half3 V, half3 L, 
 			return ClothBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
 		case SHADINGMODELID_EYE:
 			return EyeBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
-		// EK Toon
 		case SHADINGMODELID_TOON:
 			return ToonBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
 		default:
