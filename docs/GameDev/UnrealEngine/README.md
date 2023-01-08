@@ -15,3 +15,4 @@ editLink: true
 
 - [UE渲染管线概览](RenderPipeline.md)
 - [Slate渲染流程概览](SlateRender.md)
+- [UE5中的卡通渲染——自定义Shading Model](CustomShadingModel.md)
