@@ -31,6 +31,8 @@ title: Meta Tech
 - [UE渲染管线概览](./GameDev/UnrealEngine/RenderPipeline.md)
 - [Slate渲染流程概览](./GameDev/UnrealEngine/SlateRender.md)
 - [UE5中的卡通渲染——自定义Shading Model](./GameDev/UnrealEngine/CustomShadingModel.md)
+- [UE5中的卡通渲染——自定义描边Pass](./GameDev/UnrealEngine/OutlineDrawPass.md)
+
 # APP开发
 
 ## [IOS](./AppDev/IOS/README.md)
