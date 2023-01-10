@@ -80,12 +80,89 @@ namespace EMeshPass
 		EditorLevelInstance,
 		EditorSelection,
 #endif
-		ToonOutlinePass,
+		OutlinePass,
 
 		Num,
 		NumBits = 6,
 	};
 }
+```
+
+并修改静态检查中Pass的数量
+
+```C++
+inline const TCHAR* GetMeshPassName(EMeshPass::Type MeshPass)
+{
+	switch (MeshPass)
+	{
+	case EMeshPass::DepthPass: return TEXT("DepthPass");
+	case EMeshPass::BasePass: return TEXT("BasePass");
+	case EMeshPass::AnisotropyPass: return TEXT("AnisotropyPass");
+	case EMeshPass::SkyPass: return TEXT("SkyPass");
+	case EMeshPass::SingleLayerWaterPass: return TEXT("SingleLayerWaterPass");
+	case EMeshPass::SingleLayerWaterDepthPrepass: return TEXT("SingleLayerWaterDepthPrepass");
+	case EMeshPass::CSMShadowDepth: return TEXT("CSMShadowDepth");
+	case EMeshPass::VSMShadowDepth: return TEXT("VSMShadowDepth");
+	case EMeshPass::Distortion: return TEXT("Distortion");
+	case EMeshPass::Velocity: return TEXT("Velocity");
+	case EMeshPass::TranslucentVelocity: return TEXT("TranslucentVelocity");
+	case EMeshPass::TranslucencyStandard: return TEXT("TranslucencyStandard");
+	case EMeshPass::TranslucencyStandardModulate: return TEXT("TranslucencyStandardModulate");
+	case EMeshPass::TranslucencyAfterDOF: return TEXT("TranslucencyAfterDOF");
+	case EMeshPass::TranslucencyAfterDOFModulate: return TEXT("TranslucencyAfterDOFModulate");
+	case EMeshPass::TranslucencyAfterMotionBlur: return TEXT("TranslucencyAfterMotionBlur");
+	case EMeshPass::TranslucencyAll: return TEXT("TranslucencyAll");
+	case EMeshPass::LightmapDensity: return TEXT("LightmapDensity");
+	case EMeshPass::DebugViewMode: return TEXT("DebugViewMode");
+	case EMeshPass::CustomDepth: return TEXT("CustomDepth");
+	case EMeshPass::MobileBasePassCSM: return TEXT("MobileBasePassCSM");
+	case EMeshPass::VirtualTexture: return TEXT("VirtualTexture");
+	case EMeshPass::LumenCardCapture: return TEXT("LumenCardCapture");
+	case EMeshPass::LumenCardNanite: return TEXT("LumenCardNanite");
+	case EMeshPass::LumenTranslucencyRadianceCacheMark: return TEXT("LumenTranslucencyRadianceCacheMark");
+	case EMeshPass::LumenFrontLayerTranslucencyGBuffer: return TEXT("LumenFrontLayerTranslucencyGBuffer");
+	case EMeshPass::DitheredLODFadingOutMaskPass: return TEXT("DitheredLODFadingOutMaskPass");
+	case EMeshPass::NaniteMeshPass: return TEXT("NaniteMeshPass");
+	case EMeshPass::MeshDecal: return TEXT("MeshDecal");
+#if WITH_EDITOR
+	case EMeshPass::HitProxy: return TEXT("HitProxy");
+	case EMeshPass::HitProxyOpaqueOnly: return TEXT("HitProxyOpaqueOnly");
+	case EMeshPass::EditorLevelInstance: return TEXT("EditorLevelInstance");
+	case EMeshPass::EditorSelection: return TEXT("EditorSelection");
+#endif
+	case EMeshPass::OutlinePass: return TEXT("OutlinePass");
+	}
+
+#if WITH_EDITOR
+	static_assert(EMeshPass::Num == 30 + 4, "Need to update switch(MeshPass) after changing EMeshPass");
+#else
+	static_assert(EMeshPass::Num == 30, "Need to update switch(MeshPass) after changing EMeshPass");
+#endif
+```
+
+在新版本的开发分支中，增加了对于PSO数量的静态检查，因此需要在FPSOCollectorCreateManager中修改MaxPSOCollectorCount的值为目前的Pass数量
+
+```C++
+//PSOPrecache.h
+class ENGINE_API FPSOCollectorCreateManager
+{
+public:
+
+	constexpr static uint32 MaxPSOCollectorCount = 34;
+
+	static PSOCollectorCreateFunction GetCreateFunction(EShadingPath ShadingPath, uint32 Index)
+	{
+		check(Index < MaxPSOCollectorCount);
+		uint32 ShadingPathIdx = (uint32)ShadingPath;
+		return JumpTable[ShadingPathIdx][Index];
+	}
+
+private:
+
+	// Have to used fixed size array instead of TArray because of order of initialization of static member variables
+	static PSOCollectorCreateFunction JumpTable[(uint32)EShadingPath::Num][MaxPSOCollectorCount];
+	friend class FRegisterPSOCollectorCreateFunction;
+};
 ```
 
 接着创建一个新的头文件和一个新的CPP文件，用来存放新的Processor类和Shader类的实现，这一步同样可以仿照UE本身的Pass的实现，在UE本身的Pass种，参照Custom Depth Pass是一个不错的选择，流程清晰，代码量少。
@@ -233,6 +310,60 @@ public:
 //OutlinePassRendering.cpp
 IMPLEMENT_MATERIAL_SHADER_TYPE(, FOutlineVS, TEXT("/Engine/Private/OutlinePassShader.usf"), TEXT("MainVS"), SF_Vertex);
 IMPLEMENT_MATERIAL_SHADER_TYPE(, FOutlinePS, TEXT("/Engine/Private/OutlinePassShader.usf"), TEXT("MainPS"), SF_Pixel);
+```
+
+同时，新建一个usf文件用来实现描边绘制的Shader
+
+```C++
+//OutlinePassShader.usf
+#include "Common.ush"
+#include "/Engine/Generated/Material.ush"
+#include "/Engine/Generated/VertexFactory.ush"
+
+struct FSimpleMeshPassVSToPS
+{
+	FVertexFactoryInterpolantsVSToPS FactoryInterpolants;
+	float4 Position : SV_POSITION;
+};
+
+float OutLineScale;
+float3 OutLineColor;
+
+#if VERTEXSHADER
+void MainVS(
+	FVertexFactoryInput Input,
+	out FSimpleMeshPassVSToPS Output)
+{
+	ResolvedView = ResolveView();
+	
+	FVertexFactoryIntermediates VFIntermediates = GetVertexFactoryIntermediates(Input);
+	
+	float4 WorldPos = VertexFactoryGetWorldPosition(Input, VFIntermediates);
+	float3 WorldNormal = VertexFactoryGetWorldNormal(Input, VFIntermediates);
+	
+	float3x3 TangentToLocal = VertexFactoryGetTangentToLocal(Input, VFIntermediates);
+
+	FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, WorldPos.xyz, TangentToLocal);
+	WorldPos.xyz += GetMaterialWorldPositionOffset(VertexParameters);
+	WorldPos.xyz += WorldNormal * OutLineScale;
+    
+	float4 RasterizedWorldPosition = VertexFactoryGetRasterizedWorldPosition(Input, VFIntermediates, WorldPos);
+
+	Output.FactoryInterpolants = VertexFactoryGetInterpolantsVSToPS(Input, VFIntermediates, VertexParameters);
+	Output.Position = mul(RasterizedWorldPosition, ResolvedView.TranslatedWorldToClip);
+
+	float2 ExtentDir = normalize(mul(float4(WorldNormal, 1.0f), ResolvedView.TranslatedWorldToClip).xy);
+	float Scale = clamp(0.0f, 0.5f, Output.Position.w * 1.0f * 0.1f);
+	Output.Position.xy += ExtentDir * Scale;
+}
+#endif // VERTEXSHADER
+
+void MainPS(
+	FSimpleMeshPassVSToPS Input,
+	out float4 OutColor : SV_Target0)
+{
+	OutColor = float4(OutLineColor, 1.0);
+}
 ```
 
 接下来则是对Processor中三个函数的实现，同样，下面的实现也注释掉了目前还没有在Material中完成的接口部分
