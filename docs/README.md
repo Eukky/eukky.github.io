@@ -13,6 +13,8 @@ title: Meta Tech
 - [图形开发基础（三）物理渲染与渲染方程](./GameDev/Render/PBR.md)
 - [图形开发基础（四）渲染路径与常见渲染技术](./GameDev/Render/RenderingPath.md)
 - [游戏引擎中的光照和渲染](./GameDev/Render/LightAndRender.md)
+- [对Pre-Integrated Skin的一点理解](./GameDev/Render/PreIntegratedSkin.md)
+- [随机屏幕空间反射 Stochastic Screen-Space Reflections (SSSR)](./GameDev/Render/StochasticScreenSpaceReflection.md)
 
 ## [Unity](./GameDev/Unity/README.md)
 
