@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>UE5中的卡通渲染——自定义描边Pass | META TECH</title>
+    <meta name="generator" content="VuePress 1.9.10">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+    <meta name="description" content="一个单纯的技术分享站点">
+    
+    <link rel="preload" href="/assets/css/0.styles.8f3dca9f.css" as="style"><link rel="preload" href="/assets/js/app.0a53806a.js" as="script"><link rel="preload" href="/assets/js/2.e7ab5c73.js" as="script"><link rel="preload" href="/assets/js/1.924d8370.js" as="script"><link rel="preload" href="/assets/js/44.dc21de04.js" as="script"><link rel="prefetch" href="/assets/js/10.0ebf80ed.js"><link rel="prefetch" href="/assets/js/11.535042f9.js"><link rel="prefetch" href="/assets/js/12.d767b8a9.js"><link rel="prefetch" href="/assets/js/13.146adbc0.js"><link rel="prefetch" href="/assets/js/14.cc9595cb.js"><link rel="prefetch" href="/assets/js/15.ca33d6ee.js"><link rel="prefetch" href="/assets/js/16.422ef080.js"><link rel="prefetch" href="/assets/js/17.a2e66896.js"><link rel="prefetch" href="/assets/js/18.44dd0612.js"><link rel="prefetch" href="/assets/js/19.3dcb055b.js"><link rel="prefetch" href="/assets/js/20.c17320aa.js"><link rel="prefetch" href="/assets/js/21.3c44352c.js"><link rel="prefetch" href="/assets/js/22.88ae7534.js"><link rel="prefetch" href="/assets/js/23.58d8ab99.js"><link rel="prefetch" href="/assets/js/24.8d99dffd.js"><link rel="prefetch" href="/assets/js/25.113907d5.js"><link rel="prefetch" href="/assets/js/26.aa357591.js"><link rel="prefetch" href="/assets/js/27.091f926b.js"><link rel="prefetch" href="/assets/js/28.bf558f8e.js"><link rel="prefetch" href="/assets/js/29.30c9cdb0.js"><link rel="prefetch" href="/assets/js/3.c5d67b5d.js"><link rel="prefetch" href="/assets/js/30.446d6b4e.js"><link rel="prefetch" href="/assets/js/31.73bca2f0.js"><link rel="prefetch" href="/assets/js/32.a1d95602.js"><link rel="prefetch" href="/assets/js/33.750049c8.js"><link rel="prefetch" href="/assets/js/34.81d11d5a.js"><link rel="prefetch" href="/assets/js/35.bee0e457.js"><link rel="prefetch" href="/assets/js/36.00f8ea73.js"><link rel="prefetch" href="/assets/js/37.54fb757c.js"><link rel="prefetch" href="/assets/js/38.a6d55c54.js"><link rel="prefetch" href="/assets/js/39.5387c729.js"><link rel="prefetch" href="/assets/js/4.95c8e9af.js"><link rel="prefetch" href="/assets/js/40.c6ad81b1.js"><link rel="prefetch" href="/assets/js/41.f7eae51d.js"><link rel="prefetch" href="/assets/js/42.4b5d0a0f.js"><link rel="prefetch" href="/assets/js/43.bbbbdebe.js"><link rel="prefetch" href="/assets/js/45.3e2c709b.js"><link rel="prefetch" href="/assets/js/46.d470015d.js"><link rel="prefetch" href="/assets/js/47.d04a2811.js"><link rel="prefetch" href="/assets/js/48.018f9f7c.js"><link rel="prefetch" href="/assets/js/5.affefd7c.js"><link rel="prefetch" href="/assets/js/6.0ecbeb87.js"><link rel="prefetch" href="/assets/js/7.203fbb9f.js"><link rel="prefetch" href="/assets/js/vendors~docsearch.82899547.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.8f3dca9f.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">META TECH</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="游戏开发" class="dropdown-title"><span class="title">游戏开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="游戏开发" class="mobile-dropdown-title"><span class="title">游戏开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/GameDev/Unity/" class="nav-link">
+  Unity
+</a></li><li class="dropdown-item"><!----> <a href="/GameDev/UnrealEngine/" class="nav-link router-link-active">
+  Unreal Engine
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/AppDev/IOS/" class="nav-link">
+  IOS
+</a></li><li class="dropdown-item"><!----> <a href="/AppDev/Android/" class="nav-link">
+  Android
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他站点" class="dropdown-title"><span class="title">其他站点</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他站点" class="mobile-dropdown-title"><span class="title">其他站点</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://discord.gg/AVeHFqCc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Discord
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <a href="https://github.com/eukky/eukky.github.io" target="_blank" rel="noopener noreferrer" class="repo-link">
+    查看源码
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="游戏开发" class="dropdown-title"><span class="title">游戏开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="游戏开发" class="mobile-dropdown-title"><span class="title">游戏开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/GameDev/Unity/" class="nav-link">
+  Unity
+</a></li><li class="dropdown-item"><!----> <a href="/GameDev/UnrealEngine/" class="nav-link router-link-active">
+  Unreal Engine
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/AppDev/IOS/" class="nav-link">
+  IOS
+</a></li><li class="dropdown-item"><!----> <a href="/AppDev/Android/" class="nav-link">
+  Android
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他站点" class="dropdown-title"><span class="title">其他站点</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他站点" class="mobile-dropdown-title"><span class="title">其他站点</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://discord.gg/AVeHFqCc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Discord
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <a href="https://github.com/eukky/eukky.github.io" target="_blank" rel="noopener noreferrer" class="repo-link">
+    查看源码
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav>  <!----> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="ue5中的卡通渲染-自定义描边pass"><a href="#ue5中的卡通渲染-自定义描边pass" class="header-anchor">#</a> UE5中的卡通渲染——自定义描边Pass</h1> <p>上一篇讲了自定义Shading Model来在UE的材质中添加自己的光照模型，这次我们来讲讲如何在UE5的渲染管线中添加一个自定义的DrawPass来绘制法线扩张描边。</p> <h2 id="描边的绘制方法"><a href="#描边的绘制方法" class="header-anchor">#</a> 描边的绘制方法</h2> <p>绘制描边的方法多种多样，但是常见的描边绘制主要有两种思路，其一就是法线外扩的方式来绘制描边，另一种则是通过在后处理中进行边缘识别来绘制描边。</p> <p>简单讲讲两者的区别和优劣，影响顶点法线外扩描边效果的因素主要来源于顶点法线的扩张角度，而影响后处理描边效果的因素则比较多样，在RT中选择写入Detph还是选择写入自定义的Stencil Bit，都会对后期的边缘识别效果产生影响，同时，选择使用的边缘识别算子也会对最终的效果产生影响，在后处理描边的具体细化方案中，还需结合自身需求来选择一种最合适的方案进行绘制。</p> <p>这篇文章的主要目的是通过实现法线外扩描边功能来讲解UE5中的Draw Pass相关的原理和流程，因此暂时不会涉及到后处理描边的讲解，关于后处理描边，也许后面有时间了，也会尝试着做一做吧。</p> <h2 id="mesh-draw-pass的简单流程"><a href="#mesh-draw-pass的简单流程" class="header-anchor">#</a> Mesh Draw Pass的简单流程</h2> <p>添加一个Mesh Draw Pass主要需要实现三样东西</p> <ol><li>Mesh Draw Pass的Processor类</li> <li>定义VS和PS的类，以及Shader的实现</li> <li>调用RDG的Render函数</li></ol> <p>通过实现上述三种类或函数，再完成一些其他零散的修改和实现，即可完成自定义Pass的创建了。下面就来讲讲具体如何进行开发吧。</p> <h2 id="mesh-draw-pass的开发"><a href="#mesh-draw-pass的开发" class="header-anchor">#</a> Mesh Draw Pass的开发</h2> <p>首先还是一样，寻找定义Mesh Draw Pass的地方，在定义的枚举种添加我们自己的Pass名称</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//MeshPassProcessor.h
+namespace EMeshPass
+{
+	enum Type : uint8
+	{
+		DepthPass,
+		BasePass,
+		AnisotropyPass,
+		SkyPass,
+		SingleLayerWaterPass,
+		SingleLayerWaterDepthPrepass,
+		CSMShadowDepth,
+		VSMShadowDepth,
+		Distortion,
+		Velocity,
+		TranslucentVelocity,
+		TranslucencyStandard,
+		TranslucencyStandardModulate,
+		TranslucencyAfterDOF,
+		TranslucencyAfterDOFModulate,
+		TranslucencyAfterMotionBlur,
+		TranslucencyAll, /** Drawing all translucency, regardless of separate or standard.  Used when drawing translucency outside of the main renderer, eg FRendererModule::DrawTile. */
+		LightmapDensity,
+		DebugViewMode, /** Any of EDebugViewShaderMode */
+		CustomDepth,
+		MobileBasePassCSM,  /** Mobile base pass with CSM shading enabled */
+		VirtualTexture,
+		LumenCardCapture,
+		LumenCardNanite,
+		LumenTranslucencyRadianceCacheMark,
+		LumenFrontLayerTranslucencyGBuffer,
+		DitheredLODFadingOutMaskPass, /** A mini depth pass used to mark pixels with dithered LOD fading out. Currently only used by ray tracing shadows. */
+		NaniteMeshPass,
+		MeshDecal,
+
+#if WITH_EDITOR
+		HitProxy,
+		HitProxyOpaqueOnly,
+		EditorLevelInstance,
+		EditorSelection,
+#endif
+		OutlinePass,
+
+		Num,
+		NumBits = 6,
+	};
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br></div></div><p>并修改静态检查中Pass的数量</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>inline const TCHAR* GetMeshPassName(EMeshPass::Type MeshPass)
+{
+	switch (MeshPass)
+	{
+	case EMeshPass::DepthPass: return TEXT(&quot;DepthPass&quot;);
+	case EMeshPass::BasePass: return TEXT(&quot;BasePass&quot;);
+	case EMeshPass::AnisotropyPass: return TEXT(&quot;AnisotropyPass&quot;);
+	case EMeshPass::SkyPass: return TEXT(&quot;SkyPass&quot;);
+	case EMeshPass::SingleLayerWaterPass: return TEXT(&quot;SingleLayerWaterPass&quot;);
+	case EMeshPass::SingleLayerWaterDepthPrepass: return TEXT(&quot;SingleLayerWaterDepthPrepass&quot;);
+	case EMeshPass::CSMShadowDepth: return TEXT(&quot;CSMShadowDepth&quot;);
+	case EMeshPass::VSMShadowDepth: return TEXT(&quot;VSMShadowDepth&quot;);
+	case EMeshPass::Distortion: return TEXT(&quot;Distortion&quot;);
+	case EMeshPass::Velocity: return TEXT(&quot;Velocity&quot;);
+	case EMeshPass::TranslucentVelocity: return TEXT(&quot;TranslucentVelocity&quot;);
+	case EMeshPass::TranslucencyStandard: return TEXT(&quot;TranslucencyStandard&quot;);
+	case EMeshPass::TranslucencyStandardModulate: return TEXT(&quot;TranslucencyStandardModulate&quot;);
+	case EMeshPass::TranslucencyAfterDOF: return TEXT(&quot;TranslucencyAfterDOF&quot;);
+	case EMeshPass::TranslucencyAfterDOFModulate: return TEXT(&quot;TranslucencyAfterDOFModulate&quot;);
+	case EMeshPass::TranslucencyAfterMotionBlur: return TEXT(&quot;TranslucencyAfterMotionBlur&quot;);
+	case EMeshPass::TranslucencyAll: return TEXT(&quot;TranslucencyAll&quot;);
+	case EMeshPass::LightmapDensity: return TEXT(&quot;LightmapDensity&quot;);
+	case EMeshPass::DebugViewMode: return TEXT(&quot;DebugViewMode&quot;);
+	case EMeshPass::CustomDepth: return TEXT(&quot;CustomDepth&quot;);
+	case EMeshPass::MobileBasePassCSM: return TEXT(&quot;MobileBasePassCSM&quot;);
+	case EMeshPass::VirtualTexture: return TEXT(&quot;VirtualTexture&quot;);
+	case EMeshPass::LumenCardCapture: return TEXT(&quot;LumenCardCapture&quot;);
+	case EMeshPass::LumenCardNanite: return TEXT(&quot;LumenCardNanite&quot;);
+	case EMeshPass::LumenTranslucencyRadianceCacheMark: return TEXT(&quot;LumenTranslucencyRadianceCacheMark&quot;);
+	case EMeshPass::LumenFrontLayerTranslucencyGBuffer: return TEXT(&quot;LumenFrontLayerTranslucencyGBuffer&quot;);
+	case EMeshPass::DitheredLODFadingOutMaskPass: return TEXT(&quot;DitheredLODFadingOutMaskPass&quot;);
+	case EMeshPass::NaniteMeshPass: return TEXT(&quot;NaniteMeshPass&quot;);
+	case EMeshPass::MeshDecal: return TEXT(&quot;MeshDecal&quot;);
+#if WITH_EDITOR
+	case EMeshPass::HitProxy: return TEXT(&quot;HitProxy&quot;);
+	case EMeshPass::HitProxyOpaqueOnly: return TEXT(&quot;HitProxyOpaqueOnly&quot;);
+	case EMeshPass::EditorLevelInstance: return TEXT(&quot;EditorLevelInstance&quot;);
+	case EMeshPass::EditorSelection: return TEXT(&quot;EditorSelection&quot;);
+#endif
+	case EMeshPass::OutlinePass: return TEXT(&quot;OutlinePass&quot;);
+	}
+
+#if WITH_EDITOR
+	static_assert(EMeshPass::Num == 30 + 4, &quot;Need to update switch(MeshPass) after changing EMeshPass&quot;);
+#else
+	static_assert(EMeshPass::Num == 30, &quot;Need to update switch(MeshPass) after changing EMeshPass&quot;);
+#endif
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br></div></div><p>在新版本的开发分支中，增加了对于PSO数量的静态检查，因此需要在FPSOCollectorCreateManager中修改MaxPSOCollectorCount的值为目前的Pass数量</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//PSOPrecache.h
+class ENGINE_API FPSOCollectorCreateManager
+{
+public:
+
+	constexpr static uint32 MaxPSOCollectorCount = 34;
+
+	static PSOCollectorCreateFunction GetCreateFunction(EShadingPath ShadingPath, uint32 Index)
+	{
+		check(Index &lt; MaxPSOCollectorCount);
+		uint32 ShadingPathIdx = (uint32)ShadingPath;
+		return JumpTable[ShadingPathIdx][Index];
+	}
+
+private:
+
+	// Have to used fixed size array instead of TArray because of order of initialization of static member variables
+	static PSOCollectorCreateFunction JumpTable[(uint32)EShadingPath::Num][MaxPSOCollectorCount];
+	friend class FRegisterPSOCollectorCreateFunction;
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br></div></div><p>接着创建一个新的头文件和一个新的CPP文件，用来存放新的Processor类和Shader类的实现，这一步同样可以仿照UE本身的Pass的实现，在UE本身的Pass种，参照Custom Depth Pass是一个不错的选择，流程清晰，代码量少。</p> <p>首先在头文件中实现Processor类的声明，在这个类中主要包含一个构造函数和两个成员函数</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassRendering.h
+class FOutlinePassProcessor : public FMeshPassProcessor
+{
+public:
+	FOutlinePassProcessor(
+		const FScene* Scene,
+		const FSceneView* InViewIfDynamicMeshCommand,
+		const FMeshPassProcessorRenderState&amp; InPassDrawRenderState,
+		FMeshPassDrawListContext* InDrawListContext
+	);
+
+	virtual void AddMeshBatch(
+		const FMeshBatch&amp; RESTRICT MeshBatch,
+		uint64 BatchElementMask,
+		const FPrimitiveSceneProxy* RESTRICT PrimitiveSceneProxy,
+		int32 StaticMeshId = -1
+	) override final;
+
+private:
+	bool Process(
+		const FMeshBatch&amp; MeshBatch,
+		uint64 BatchElementMask,
+		int32 StaticMeshId,
+		const FPrimitiveSceneProxy* RESTRICT PrimitiveSceneProxy,
+		const FMaterialRenderProxy&amp; RESTRICT MaterialRenderProxy,
+		const FMaterial&amp; RESTRICT MaterialResource,
+		ERasterizerFillMode MeshFillMode,
+		ERasterizerCullMode MeshCullMode
+	);
+	
+	FMeshPassProcessorRenderState PassDrawRenderState;
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br></div></div><p>接着是VS和PS两个Shader类的实现，由于目前尚未实现材质中获取描边参数的接口，可以暂时把下面代码中获取参数的代码注释掉，转而传给Shader一个定值来测试功能是否能够正常使用</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassRendering.h
+class FOutlineVS : public FMeshMaterialShader
+{
+	DECLARE_SHADER_TYPE(FOutlineVS, MeshMaterial);
+
+public:
+	FOutlineVS() = default;
+	FOutlineVS(const ShaderMetaType::CompiledShaderInitializerType&amp; Initializer)
+		: FMeshMaterialShader(Initializer)
+	{
+		OutLineScale.Bind(Initializer.ParameterMap, TEXT(&quot;OutLineScale&quot;));
+	}
+
+	static void ModifyCompilationEnvironment(const FMaterialShaderPermutationParameters&amp; Parameters, FShaderCompilerEnvironment&amp; OutEnvironment)
+	{}
+
+	static bool ShouldCompilePermutation(const FMeshMaterialShaderPermutationParameters&amp; Parameters)
+	{
+		return IsFeatureLevelSupported(Parameters.Platform, ERHIFeatureLevel::SM5) &amp;&amp;
+			Parameters.MaterialParameters.bHasOutline &amp;&amp; 
+			(Parameters.VertexFactoryType-&gt;GetFName() == FName(TEXT(&quot;FLocalVertexFactory&quot;)) || 
+				Parameters.VertexFactoryType-&gt;GetFName() == FName(TEXT(&quot;TGPUSkinVertexFactoryDefault&quot;)));
+	}
+
+	void GetShaderBindings(
+		const FScene* Scene,
+		ERHIFeatureLevel::Type FeatureLevel,
+		const FPrimitiveSceneProxy* PrimitiveSceneProxy,
+		const FMaterialRenderProxy&amp; MaterialRenderProxy,
+		const FMaterial&amp; Material,
+		const FMeshPassProcessorRenderState&amp; DrawRenderState,
+		const FMeshMaterialShaderElementData&amp; ShaderElementData,
+		FMeshDrawSingleShaderBindings&amp; ShaderBindings) const
+	{
+		FMeshMaterialShader::GetShaderBindings(Scene, FeatureLevel, PrimitiveSceneProxy, MaterialRenderProxy, Material, DrawRenderState, ShaderElementData, ShaderBindings);
+
+		// const float OutlineScale = Material.GetOutlineScale();
+		ShaderBindings.Add(OutLineScale, 1.0);
+	}
+
+	LAYOUT_FIELD(FShaderParameter, OutLineScale);
+};
+
+
+class FOutlinePS : public FMeshMaterialShader
+{
+	DECLARE_SHADER_TYPE(FOutlinePS, MeshMaterial);
+	
+public:
+
+	FOutlinePS() = default;
+	FOutlinePS(const ShaderMetaType::CompiledShaderInitializerType&amp; Initializer)
+		: FMeshMaterialShader(Initializer)
+	{
+		OutLineColor.Bind(Initializer.ParameterMap, TEXT(&quot;OutLineColor&quot;));
+	}
+
+	static void ModifyCompilationEnvironment(const FMaterialShaderPermutationParameters&amp; Parameters, FShaderCompilerEnvironment&amp; OutEnvironment)
+	{}
+
+	static bool ShouldCompilePermutation(const FMeshMaterialShaderPermutationParameters&amp; Parameters)
+	{
+		return IsFeatureLevelSupported(Parameters.Platform, ERHIFeatureLevel::SM5) &amp;&amp;
+			Parameters.MaterialParameters.bHasOutline &amp;&amp; 
+			(Parameters.VertexFactoryType-&gt;GetFName() == FName(TEXT(&quot;FLocalVertexFactory&quot;)) || 
+				Parameters.VertexFactoryType-&gt;GetFName() == FName(TEXT(&quot;TGPUSkinVertexFactoryDefault&quot;)));
+	}
+	
+	void GetShaderBindings(
+		const FScene* Scene,
+		ERHIFeatureLevel::Type FeatureLevel,
+		const FPrimitiveSceneProxy* PrimitiveSceneProxy,
+		const FMaterialRenderProxy&amp; MaterialRenderProxy,
+		const FMaterial&amp; Material,
+		const FMeshPassProcessorRenderState&amp; DrawRenderState,
+		const FMeshMaterialShaderElementData&amp; ShaderElementData,
+		FMeshDrawSingleShaderBindings&amp; ShaderBindings) const
+	{
+		FMeshMaterialShader::GetShaderBindings(Scene, FeatureLevel, PrimitiveSceneProxy, MaterialRenderProxy, Material, DrawRenderState, ShaderElementData, ShaderBindings);
+
+		// const FLinearColor OutlineColor = Material.GetOutlineColor();
+		FVector3f Color(1.0, 0.0, 0.0);
+
+		ShaderBindings.Add(OutLineColor, Color);
+	}
+	
+	LAYOUT_FIELD(FShaderParameter, OutLineColor);
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br></div></div><p>整个Shader类的实现非常简单，主要可以分为以下几个部分</p> <ul><li><code>DECLARE_SHADER_TYPE</code>用于在UE中声明Shader的类型</li> <li><code>LAYOUT_FIELD</code>用于声明Shader中能够传入的Uniform参数</li> <li><code>ModifyCompilationEnvironment</code>用于在Shader中定义特定的宏</li> <li><code>GetShaderBindings</code>用于绑定已经声明的Uniform参数</li></ul> <p>如此一来，Shader类这部分就基本算是完成了，但是也不要忘了在CPP文件中将对应的Shader文件绑定到这个Shader类上，这样在编译之后UE才能找到对应的Shader文件</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassRendering.cpp
+IMPLEMENT_MATERIAL_SHADER_TYPE(, FOutlineVS, TEXT(&quot;/Engine/Private/OutlinePassShader.usf&quot;), TEXT(&quot;MainVS&quot;), SF_Vertex);
+IMPLEMENT_MATERIAL_SHADER_TYPE(, FOutlinePS, TEXT(&quot;/Engine/Private/OutlinePassShader.usf&quot;), TEXT(&quot;MainPS&quot;), SF_Pixel);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>同时，新建一个usf文件用来实现描边绘制的Shader</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassShader.usf
+#include &quot;Common.ush&quot;
+#include &quot;/Engine/Generated/Material.ush&quot;
+#include &quot;/Engine/Generated/VertexFactory.ush&quot;
+
+struct FSimpleMeshPassVSToPS
+{
+	FVertexFactoryInterpolantsVSToPS FactoryInterpolants;
+	float4 Position : SV_POSITION;
+};
+
+float OutLineScale;
+float3 OutLineColor;
+
+#if VERTEXSHADER
+void MainVS(
+	FVertexFactoryInput Input,
+	out FSimpleMeshPassVSToPS Output)
+{
+	ResolvedView = ResolveView();
+	
+	FVertexFactoryIntermediates VFIntermediates = GetVertexFactoryIntermediates(Input);
+	
+	float4 WorldPos = VertexFactoryGetWorldPosition(Input, VFIntermediates);
+	float3 WorldNormal = VertexFactoryGetWorldNormal(Input, VFIntermediates);
+	
+	float3x3 TangentToLocal = VertexFactoryGetTangentToLocal(Input, VFIntermediates);
+
+	FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, WorldPos.xyz, TangentToLocal);
+	WorldPos.xyz += GetMaterialWorldPositionOffset(VertexParameters);
+	WorldPos.xyz += WorldNormal * OutLineScale;
+    
+	float4 RasterizedWorldPosition = VertexFactoryGetRasterizedWorldPosition(Input, VFIntermediates, WorldPos);
+
+	Output.FactoryInterpolants = VertexFactoryGetInterpolantsVSToPS(Input, VFIntermediates, VertexParameters);
+	Output.Position = mul(RasterizedWorldPosition, ResolvedView.TranslatedWorldToClip);
+
+	float2 ExtentDir = normalize(mul(float4(WorldNormal, 1.0f), ResolvedView.TranslatedWorldToClip).xy);
+	float Scale = clamp(0.0f, 0.5f, Output.Position.w * 1.0f * 0.1f);
+	Output.Position.xy += ExtentDir * Scale;
+}
+#endif // VERTEXSHADER
+
+void MainPS(
+	FSimpleMeshPassVSToPS Input,
+	out float4 OutColor : SV_Target0)
+{
+	OutColor = float4(OutLineColor, 1.0);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br></div></div><p>接下来则是对Processor中三个函数的实现，同样，下面的实现也注释掉了目前还没有在Material中完成的接口部分</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassRendering.cpp
+FOutlinePassProcessor::FOutlinePassProcessor(
+	const FScene* Scene,
+	const FSceneView* InViewIfDynamicMeshCommand,
+	const FMeshPassProcessorRenderState&amp; InPassDrawRenderState,
+	FMeshPassDrawListContext* InDrawListContext)
+:FMeshPassProcessor(Scene, Scene-&gt;GetFeatureLevel(), InViewIfDynamicMeshCommand, InDrawListContext),
+PassDrawRenderState(InPassDrawRenderState)
+{
+	// PassDrawRenderState.SetViewUniformBuffer(Scene-&gt;UniformBuffers.ViewUniform);
+	if (PassDrawRenderState.GetDepthStencilState() == nullptr)
+	{
+		PassDrawRenderState.SetDepthStencilState(TStaticDepthStencilState&lt;false, CF_NotEqual&gt;().GetRHI());
+	}
+	if (PassDrawRenderState.GetBlendState() == nullptr)
+	{
+		PassDrawRenderState.SetBlendState(TStaticBlendState&lt;&gt;().GetRHI());
+	}
+}
+
+void FOutlinePassProcessor::AddMeshBatch(
+	const FMeshBatch&amp; MeshBatch,
+	uint64 BatchElementMask,
+	const FPrimitiveSceneProxy* PrimitiveSceneProxy,
+	int32 StaticMeshId)
+{
+	const FMaterialRenderProxy* MaterialRenderProxy = MeshBatch.MaterialRenderProxy;
+	const FMaterialRenderProxy* FallBackMaterialRenderProxyPtr = nullptr;
+	const FMaterial* Material = MaterialRenderProxy-&gt;GetMaterialNoFallback(FeatureLevel);
+	
+	// only set in Material will draw outline
+	if (Material != nullptr &amp;&amp; Material-&gt;GetRenderingThreadShaderMap() /*&amp;&amp; Material-&gt;HasOutline()*/)
+	{
+		// Determine the mesh's material and blend mode.
+		const EBlendMode BlendMode = Material-&gt;GetBlendMode();
+
+		bool bResult = true;
+		if (BlendMode == BLEND_Opaque)
+		{
+			Process(
+				MeshBatch,
+				BatchElementMask,
+				StaticMeshId,
+				PrimitiveSceneProxy,
+				*MaterialRenderProxy,
+				*Material,
+				FM_Solid,
+				CM_CCW);
+		}
+	}
+}
+
+bool FOutlinePassProcessor::Process(
+	const FMeshBatch&amp; MeshBatch,
+	uint64 BatchElementMask,
+	int32 StaticMeshId,
+	const FPrimitiveSceneProxy* PrimitiveSceneProxy,
+	const FMaterialRenderProxy&amp; MaterialRenderProxy,
+	const FMaterial&amp; RESTRICT MaterialResource,
+	ERasterizerFillMode MeshFillMode,
+	ERasterizerCullMode MeshCullMode)
+{
+	const FVertexFactory* VertexFactory = MeshBatch.VertexFactory;
+
+	TMeshProcessorShaders&lt;FOutlineVS, FOutlinePS&gt; OutlineShaders;
+	
+	{
+		FMaterialShaderTypes ShaderTypes;
+		ShaderTypes.AddShaderType&lt;FOutlineVS&gt;();
+		ShaderTypes.AddShaderType&lt;FOutlinePS&gt;();
+	
+		const FVertexFactoryType* VertexFactoryType = VertexFactory-&gt;GetType();
+	
+		FMaterialShaders Shaders;
+		if (!MaterialResource.TryGetShaders(ShaderTypes, VertexFactoryType, Shaders))
+		{
+			UE_LOG(LogShaders, Warning, TEXT(&quot;Shader Not Found!&quot;));
+			return false;
+		}
+	
+		Shaders.TryGetVertexShader(OutlineShaders.VertexShader);
+		Shaders.TryGetPixelShader(OutlineShaders.PixelShader);
+	}
+
+	
+	FMeshMaterialShaderElementData ShaderElementData;
+	ShaderElementData.InitializeMeshMaterialData(ViewIfDynamicMeshCommand, PrimitiveSceneProxy, MeshBatch, StaticMeshId, false);
+
+	const FMeshDrawCommandSortKey SortKey = CalculateMeshStaticSortKey(OutlineShaders.VertexShader, OutlineShaders.PixelShader);
+
+	PassDrawRenderState.SetDepthStencilState(
+	TStaticDepthStencilState&lt;
+	true, CF_GreaterEqual,// Enable DepthTest, It reverse about OpenGL(which is less)
+	false, CF_Never, SO_Keep, SO_Keep, SO_Keep,
+	false, CF_Never, SO_Keep, SO_Keep, SO_Keep,// enable stencil test when cull back
+	0x00,// disable stencil read
+	0x00&gt;// disable stencil write
+	::GetRHI());
+	PassDrawRenderState.SetStencilRef(0);
+	
+	BuildMeshDrawCommands(
+		MeshBatch,
+		BatchElementMask,
+		PrimitiveSceneProxy,
+		MaterialRenderProxy,
+		MaterialResource,
+		PassDrawRenderState,
+		OutlineShaders,
+		MeshFillMode,
+		MeshCullMode,
+		SortKey,
+		EMeshPassFeatures::Default,
+		ShaderElementData
+	);
+	
+	return true;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br></div></div><p>这段代码看似复杂，实在主要完成了以下几个部分的功能</p> <ul><li>构造函数中主要完成对渲染状态的重置和清零</li> <li>在<code>AddMeshBatch</code>中，则主要用来收集需要在该Pass中进行绘制的Mesh，同时调用<code>Process</code>函数，实现主要的功能</li> <li>在<code>Process</code>中，主要完成了以下几件事情，获取Shader，设置渲染状态，以及调用<code>BuildMeshDrawCommands</code>构建渲染指令，而这些渲染指令则是最终我们在RDG中去执行的渲染指令</li></ul> <p>UE对图形渲染的实现做了很多封装，同时又因为其自身管线的复杂程度，导致其自身的工程实现非常重，但是从另一方面来看，在实现了上述的Processor之后，渲染所需要的准备就基本上算是完成了，你会发现在实现的过程中并没有接触到图形API相关的概念，而是把注意力集中到了对Mesh的处理以及对渲染状态的处理上，所以UE的这套管线封装，在我看来有利有弊，也算是一把双刃剑吧。</p> <p>但是仅仅是这样子还远远不能让这个Pass跑起来，我们还需要再添加一些另外的东西。</p> <p>首先是这个Processor的注册</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassRendering.cpp
+void SetupOutlinePassState(FMeshPassProcessorRenderState&amp; DrawRenderState)
+{
+	DrawRenderState.SetDepthStencilState(TStaticDepthStencilState&lt;true, CF_LessEqual&gt;().GetRHI());
+}
+
+FMeshPassProcessor* CreateOutlinePassProcessor(const FScene* Scene, const FSceneView* InViewIfDynamicMeshCommand, FMeshPassDrawListContext* InDrawListContext)
+{
+	FMeshPassProcessorRenderState OutlinePassState;
+	SetupOutlinePassState(OutlinePassState);
+	return new FOutlinePassProcessor(Scene, InViewIfDynamicMeshCommand, OutlinePassState, InDrawListContext);
+}
+
+FRegisterPassProcessorCreateFunction RegisterOutlinePass(&amp;CreateOutlinePassProcessor, EShadingPath::Deferred, EMeshPass::OutlinePass, EMeshPassFlags::CachedMeshCommands | EMeshPassFlags::MainView);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br></div></div><p>在注册完成之后，UE会替我们去创建这个Processor，而不需要我们自己去构造这个Processor的实例对象了</p> <p>接着，在DeferredShadingRenderer中声明Render函数</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//DeferredShadingRenderer.h
+void RenderPrePass(FRDGBuilder&amp; GraphBuilder, FRDGTextureRef SceneDepthTexture, FInstanceCullingManager&amp; InstanceCullingManager);
+void RenderPrePassHMD(FRDGBuilder&amp; GraphBuilder, FRDGTextureRef SceneDepthTexture);
+
+void RenderOutlinePass(FRDGBuilder&amp; GraphBuilder, FSceneTextures&amp; SceneTextures);
+
+void RenderFog(
+    FRDGBuilder&amp; GraphBuilder,
+    const FMinimalSceneTextures&amp; SceneTextures,
+    FRDGTextureRef LightShaftOcclusionTexture);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br></div></div><p>将Render的函数依旧放入Processor的CPP文件中，由于需要在RDG中传入绘制所需要的View以及SceneTexture，在此处还需使用Shader宏来定义UniformBuffer，以便传入绘制所需要的参数</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//OutlinePassRendering.cpp
+DECLARE_CYCLE_STAT(TEXT(&quot;OutlinePass&quot;), STAT_CLP_OutlinePass, STATGROUP_ParallelCommandListMarkers);
+
+BEGIN_SHADER_PARAMETER_STRUCT(FOutlineMeshPassParameters, )
+	SHADER_PARAMETER_STRUCT_REF(FViewUniformShaderParameters, View)
+	SHADER_PARAMETER_STRUCT_INCLUDE(FInstanceCullingDrawParams, InstanceCullingDrawParams)
+	RENDER_TARGET_BINDING_SLOTS()
+END_SHADER_PARAMETER_STRUCT()
+
+FOutlineMeshPassParameters* GetOutlinePassParameters(FRDGBuilder&amp; GraphBuilder, const FViewInfo&amp; View, FSceneTextures&amp; SceneTextures)
+{
+	FOutlineMeshPassParameters* PassParameters = GraphBuilder.AllocParameters&lt;FOutlineMeshPassParameters&gt;();
+	PassParameters-&gt;View = View.ViewUniformBuffer;
+
+	PassParameters-&gt;RenderTargets[0] = FRenderTargetBinding(SceneTextures.Color.Target, ERenderTargetLoadAction::ELoad);
+	PassParameters-&gt;RenderTargets.DepthStencil = FDepthStencilBinding(SceneTextures.Depth.Target, ERenderTargetLoadAction::ELoad, ERenderTargetLoadAction::ELoad, FExclusiveDepthStencil::DepthWrite_StencilWrite);
+
+	return PassParameters;
+}
+
+
+void FDeferredShadingSceneRenderer::RenderOutlinePass(FRDGBuilder&amp; GraphBuilder, FSceneTextures&amp; SceneTextures)
+{
+	RDG_EVENT_SCOPE(GraphBuilder, &quot;OutlinePass&quot;);
+	RDG_CSV_STAT_EXCLUSIVE_SCOPE(GraphBuilder, RenderOutlinePass);
+
+	SCOPED_NAMED_EVENT(FDeferredShadingSceneRenderer_RenderOutlinePass, FColor::Emerald);
+
+	for(int32 ViewIndex = 0; ViewIndex &lt; Views.Num(); ++ViewIndex)
+	{
+		FViewInfo&amp; View = Views[ViewIndex];
+		RDG_GPU_MASK_SCOPE(GraphBuilder, View.GPUMask);
+		RDG_EVENT_SCOPE_CONDITIONAL(GraphBuilder, Views.Num() &gt; 1, &quot;View%d&quot;, ViewIndex);
+
+		const bool bShouldRenderView = View.ShouldRenderView();
+		if(bShouldRenderView)
+		{
+			FOutlineMeshPassParameters* PassParameters = GetOutlinePassParameters(GraphBuilder, View, SceneTextures);
+			
+			View.ParallelMeshDrawCommandPasses[EMeshPass::OutlinePass].BuildRenderingCommands(GraphBuilder, Scene-&gt;GPUScene, PassParameters-&gt;InstanceCullingDrawParams);
+
+			GraphBuilder.AddPass(
+				RDG_EVENT_NAME(&quot;OutlinePass&quot;),
+				PassParameters,
+				ERDGPassFlags::Raster | ERDGPassFlags::SkipRenderPass,
+				[this, &amp;View, PassParameters](const FRDGPass* InPass, FRHICommandListImmediate&amp; RHICmdList)
+			{
+				FRDGParallelCommandListSet ParallelCommandListSet(InPass, RHICmdList, GET_STATID(STAT_CLP_OutlinePass), *this, View, FParallelCommandListBindings(PassParameters));
+				ParallelCommandListSet.SetHighPriority();
+				SetStereoViewport(RHICmdList, View, 1.0f);
+				View.ParallelMeshDrawCommandPasses[EMeshPass::OutlinePass].DispatchDraw(&amp;ParallelCommandListSet, RHICmdList, &amp;PassParameters-&gt;InstanceCullingDrawParams);
+			});
+		}
+	}
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br></div></div><p>接着，还需要在可见相关性函数中添加渲染指令的构建条件，这里同样注释掉还未实现的接口部分，以方便测试功能</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//SceneVisibility.cpp
+// if (StaticMeshRelevance.bHasOutline)
+{
+    DrawCommandPacket.AddCommandsForMesh(PrimitiveIndex, PrimitiveSceneInfo, StaticMeshRelevance, StaticMesh, Scene, bCanCache, EMeshPass::OutlinePass);
+}
+
+if (StaticMeshRelevance.bUseAnisotropy)
+{
+    DrawCommandPacket.AddCommandsForMesh(PrimitiveIndex, PrimitiveSceneInfo, StaticMeshRelevance, StaticMesh, Scene, bCanCache, EMeshPass::AnisotropyPass);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br></div></div><p>最后，在Render主函数中调用刚刚实现的Render函数，即可看到添加的自定义Pass运行起来了</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//DeferredShadingRenderer.cpp
+RenderOutlinePass(GraphBuilder, SceneTextures);
+
+AddSubsurfacePass(GraphBuilder, SceneTextures, Views);
+
+Strata::AddStrataOpaqueRoughRefractionPasses(GraphBuilder, SceneTextures, Views);
+
+{
+    RenderHairStrandsSceneColorScattering(GraphBuilder, SceneTextures.Color.Target, Scene, Views);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br></div></div><p>到这里，描边绘制的功能显然是不完善的，那么下一篇就继续讲讲，如何针对这个功能，做一些编辑器的定制吧。</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/eukky/eukky.github.io/edit/dev/docs/GameDev/UnrealEngine/OutlineDrawPass.md" target="_blank" rel="noopener noreferrer">Edit</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.0a53806a.js" defer></script><script src="/assets/js/2.e7ab5c73.js" defer></script><script src="/assets/js/1.924d8370.js" defer></script><script src="/assets/js/44.dc21de04.js" defer></script>
+  </body>
+</html>

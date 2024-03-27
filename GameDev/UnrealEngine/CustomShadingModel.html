@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>UE5中的卡通渲染——自定义Shading Model | META TECH</title>
+    <meta name="generator" content="VuePress 1.9.10">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+    <meta name="description" content="一个单纯的技术分享站点">
+    
+    <link rel="preload" href="/assets/css/0.styles.8f3dca9f.css" as="style"><link rel="preload" href="/assets/js/app.0a53806a.js" as="script"><link rel="preload" href="/assets/js/2.e7ab5c73.js" as="script"><link rel="preload" href="/assets/js/1.924d8370.js" as="script"><link rel="preload" href="/assets/js/42.4b5d0a0f.js" as="script"><link rel="prefetch" href="/assets/js/10.0ebf80ed.js"><link rel="prefetch" href="/assets/js/11.535042f9.js"><link rel="prefetch" href="/assets/js/12.d767b8a9.js"><link rel="prefetch" href="/assets/js/13.146adbc0.js"><link rel="prefetch" href="/assets/js/14.cc9595cb.js"><link rel="prefetch" href="/assets/js/15.ca33d6ee.js"><link rel="prefetch" href="/assets/js/16.422ef080.js"><link rel="prefetch" href="/assets/js/17.a2e66896.js"><link rel="prefetch" href="/assets/js/18.44dd0612.js"><link rel="prefetch" href="/assets/js/19.3dcb055b.js"><link rel="prefetch" href="/assets/js/20.c17320aa.js"><link rel="prefetch" href="/assets/js/21.3c44352c.js"><link rel="prefetch" href="/assets/js/22.88ae7534.js"><link rel="prefetch" href="/assets/js/23.58d8ab99.js"><link rel="prefetch" href="/assets/js/24.8d99dffd.js"><link rel="prefetch" href="/assets/js/25.113907d5.js"><link rel="prefetch" href="/assets/js/26.aa357591.js"><link rel="prefetch" href="/assets/js/27.091f926b.js"><link rel="prefetch" href="/assets/js/28.bf558f8e.js"><link rel="prefetch" href="/assets/js/29.30c9cdb0.js"><link rel="prefetch" href="/assets/js/3.c5d67b5d.js"><link rel="prefetch" href="/assets/js/30.446d6b4e.js"><link rel="prefetch" href="/assets/js/31.73bca2f0.js"><link rel="prefetch" href="/assets/js/32.a1d95602.js"><link rel="prefetch" href="/assets/js/33.750049c8.js"><link rel="prefetch" href="/assets/js/34.81d11d5a.js"><link rel="prefetch" href="/assets/js/35.bee0e457.js"><link rel="prefetch" href="/assets/js/36.00f8ea73.js"><link rel="prefetch" href="/assets/js/37.54fb757c.js"><link rel="prefetch" href="/assets/js/38.a6d55c54.js"><link rel="prefetch" href="/assets/js/39.5387c729.js"><link rel="prefetch" href="/assets/js/4.95c8e9af.js"><link rel="prefetch" href="/assets/js/40.c6ad81b1.js"><link rel="prefetch" href="/assets/js/41.f7eae51d.js"><link rel="prefetch" href="/assets/js/43.bbbbdebe.js"><link rel="prefetch" href="/assets/js/44.dc21de04.js"><link rel="prefetch" href="/assets/js/45.3e2c709b.js"><link rel="prefetch" href="/assets/js/46.d470015d.js"><link rel="prefetch" href="/assets/js/47.d04a2811.js"><link rel="prefetch" href="/assets/js/48.018f9f7c.js"><link rel="prefetch" href="/assets/js/5.affefd7c.js"><link rel="prefetch" href="/assets/js/6.0ecbeb87.js"><link rel="prefetch" href="/assets/js/7.203fbb9f.js"><link rel="prefetch" href="/assets/js/vendors~docsearch.82899547.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.8f3dca9f.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">META TECH</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="游戏开发" class="dropdown-title"><span class="title">游戏开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="游戏开发" class="mobile-dropdown-title"><span class="title">游戏开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/GameDev/Unity/" class="nav-link">
+  Unity
+</a></li><li class="dropdown-item"><!----> <a href="/GameDev/UnrealEngine/" class="nav-link router-link-active">
+  Unreal Engine
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/AppDev/IOS/" class="nav-link">
+  IOS
+</a></li><li class="dropdown-item"><!----> <a href="/AppDev/Android/" class="nav-link">
+  Android
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他站点" class="dropdown-title"><span class="title">其他站点</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他站点" class="mobile-dropdown-title"><span class="title">其他站点</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://discord.gg/AVeHFqCc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Discord
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <a href="https://github.com/eukky/eukky.github.io" target="_blank" rel="noopener noreferrer" class="repo-link">
+    查看源码
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="游戏开发" class="dropdown-title"><span class="title">游戏开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="游戏开发" class="mobile-dropdown-title"><span class="title">游戏开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/GameDev/Unity/" class="nav-link">
+  Unity
+</a></li><li class="dropdown-item"><!----> <a href="/GameDev/UnrealEngine/" class="nav-link router-link-active">
+  Unreal Engine
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="APP开发" class="dropdown-title"><span class="title">APP开发</span> <span class="arrow down"></span></button> <button type="button" aria-label="APP开发" class="mobile-dropdown-title"><span class="title">APP开发</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/AppDev/IOS/" class="nav-link">
+  IOS
+</a></li><li class="dropdown-item"><!----> <a href="/AppDev/Android/" class="nav-link">
+  Android
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他站点" class="dropdown-title"><span class="title">其他站点</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他站点" class="mobile-dropdown-title"><span class="title">其他站点</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://discord.gg/AVeHFqCc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Discord
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <a href="https://github.com/eukky/eukky.github.io" target="_blank" rel="noopener noreferrer" class="repo-link">
+    查看源码
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav>  <!----> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="ue5中的卡通渲染-自定义shading-model"><a href="#ue5中的卡通渲染-自定义shading-model" class="header-anchor">#</a> UE5中的卡通渲染——自定义Shading Model</h1> <p>虽然距离上一次投稿已经过去了好久，在这段时间里面，我也尝试了去用UE5自定义一些渲染管线来实现卡通渲染，虽然知乎上已经有非常多的大佬已经讲过了这些东西，但是由于我的开发分支是跟随着ue5-main的分支一起开发的，期间还是遇到了一些别人文章中没有遇到的坑。如果有小伙伴也想实时跟随着官方的进度一起在主开发分支进行开发，在开发的同时能够第一时间尝鲜到官方制作的新功能以及新Bug，那么可以参考一下，我遇到的坑里面，有没有一些对你能够产生帮助的东西。</p> <h2 id="shading-model的简单原理"><a href="#shading-model的简单原理" class="header-anchor">#</a> Shading Model的简单原理</h2> <p>开发一个新的着色模型最直接的方式就是去添加一个自定义的Shading Model了。由于知乎上已经有太多的文章直接展示了如何去扩展一个Shading Model的代码，我在实践的过程中也参考了其中不少，但是鲜有文章能够简单的讲解一下UE的内部一个Shading Model是如何生效的，其中的原理又分为哪几步，那么这里就基于我自己的实践简单讲讲吧。</p> <p>一个Shading Model需要生效，到最终在材质中去表现出来，简单来说需要以下这么几步</p> <ol><li>在母材质中选中需要使用的Shading Model</li> <li>在选中之后，该Shading Model的值会被传入到材质的输入参数<code>PixelMaterialInputs</code>中，以便在PS中获取这个参数</li> <li>由于是延迟渲染，同时，该Shading Model的值也会通过<code>SetGBufferForShadingModel</code>函数被传入到GBuffer</li> <li>在处理完参数的输入之后，最终在光照计算的<code>IntegrateBxDF</code>函数里面根据传入的Shading Model的值来选择对应的BxDF函数来进行光照计算</li> <li>最后就是执行我们自定义的BxDF的光照计算了</li></ol> <p>通过上述步骤，就可以让一个Shading Model所定义的光照计算最终被材质调用，在画面中表现出来。</p> <h2 id="shading-model的开发"><a href="#shading-model的开发" class="header-anchor">#</a> Shading Model的开发</h2> <p>理清了上述步骤，Shading Model的开发步骤已经变得非常清晰。</p> <p>首先需要在母材质的编辑器中添加我们新的Shading Model选项，只需要在<code>EMaterialShadingModel</code>中添加对应的枚举值即可</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//EngineTypes.h
+UENUM()
+enum EMaterialShadingModel : int
+{
+	MSM_Unlit					UMETA(DisplayName=&quot;Unlit&quot;),
+	MSM_DefaultLit				UMETA(DisplayName=&quot;Default Lit&quot;),
+	MSM_Subsurface				UMETA(DisplayName=&quot;Subsurface&quot;),
+	MSM_PreintegratedSkin		UMETA(DisplayName=&quot;Preintegrated Skin&quot;),
+	MSM_ClearCoat				UMETA(DisplayName=&quot;Clear Coat&quot;),
+	MSM_SubsurfaceProfile		UMETA(DisplayName=&quot;Subsurface Profile&quot;),
+	MSM_TwoSidedFoliage			UMETA(DisplayName=&quot;Two Sided Foliage&quot;),
+	MSM_Hair					UMETA(DisplayName=&quot;Hair&quot;),
+	MSM_Cloth					UMETA(DisplayName=&quot;Cloth&quot;),
+	MSM_Eye						UMETA(DisplayName=&quot;Eye&quot;),
+	MSM_SingleLayerWater		UMETA(DisplayName=&quot;SingleLayerWater&quot;),
+	MSM_ThinTranslucent			UMETA(DisplayName=&quot;Thin Translucent&quot;),
+	MSM_Strata					UMETA(DisplayName=&quot;Strata&quot;, Hidden),
+	MSM_Toon					UMETA(DisplayName=&quot;Toon&quot;),
+	/** Number of unique shading models. */
+	MSM_NUM						UMETA(Hidden),
+	/** Shading model will be determined by the Material Expression Graph,
+		by utilizing the 'Shading Model' MaterialAttribute output pin. */
+	MSM_FromMaterialExpression	UMETA(DisplayName=&quot;From Material Expression&quot;),
+	MSM_MAX
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br></div></div><p>增加了定义之后，一切都变得简单了起来，俗话说的好，UE的开发就是照葫芦画瓢，我们只需要随意在上面选择另外一个Shading Model，然后全局搜索，在搜索结果中照抄就好。</p> <p>添加枚举转字符串</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//MaterialShader.cpp
+FString GetShadingModelString(EMaterialShadingModel ShadingModel)
+{
+	FString ShadingModelName;
+	switch(ShadingModel)
+	{
+		case MSM_Unlit:				ShadingModelName = TEXT(&quot;MSM_Unlit&quot;); break;
+		case MSM_DefaultLit:		ShadingModelName = TEXT(&quot;MSM_DefaultLit&quot;); break;
+		case MSM_Subsurface:		ShadingModelName = TEXT(&quot;MSM_Subsurface&quot;); break;
+		case MSM_PreintegratedSkin:	ShadingModelName = TEXT(&quot;MSM_PreintegratedSkin&quot;); break;
+		case MSM_ClearCoat:			ShadingModelName = TEXT(&quot;MSM_ClearCoat&quot;); break;
+		case MSM_SubsurfaceProfile:	ShadingModelName = TEXT(&quot;MSM_SubsurfaceProfile&quot;); break;
+		case MSM_TwoSidedFoliage:	ShadingModelName = TEXT(&quot;MSM_TwoSidedFoliage&quot;); break;
+		case MSM_Hair:				ShadingModelName = TEXT(&quot;MSM_Hair&quot;); break;
+		case MSM_Cloth:				ShadingModelName = TEXT(&quot;MSM_Cloth&quot;); break;
+		case MSM_Eye:				ShadingModelName = TEXT(&quot;MSM_Eye&quot;); break;
+		case MSM_SingleLayerWater:	ShadingModelName = TEXT(&quot;MSM_SingleLayerWater&quot;); break;
+		case MSM_ThinTranslucent:	ShadingModelName = TEXT(&quot;MSM_ThinTranslucent&quot;); break;
+		case MSM_Toon:				ShadingModelName = TEXT(&quot;MSM_Toon&quot;); break;
+		default: ShadingModelName = TEXT(&quot;Unknown&quot;); break;
+	}
+	return ShadingModelName;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br></div></div><p>添加Shader中的宏定义</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//HLSLMaterialTranslator.cpp
+if (ShadingModels.HasShadingModel(MSM_SingleLayerWater))
+{
+    OutEnvironment.SetDefine(TEXT(&quot;MATERIAL_SHADINGMODEL_SINGLELAYERWATER&quot;), TEXT(&quot;1&quot;));
+    NumSetMaterials++;
+}
+if (ShadingModels.HasShadingModel(MSM_ThinTranslucent))
+{
+    OutEnvironment.SetDefine(TEXT(&quot;MATERIAL_SHADINGMODEL_THIN_TRANSLUCENT&quot;), TEXT(&quot;1&quot;));
+    NumSetMaterials++;
+
+    bMaterialRequestsDualSourceBlending = true;
+}
+
+if (ShadingModels.HasShadingModel(MSM_Toon)) 
+{
+    OutEnvironment.SetDefine(TEXT(&quot;MATERIAL_SHADINGMODEL_TOON&quot;), TEXT(&quot;1&quot;));
+    NumSetMaterials++;
+}
+
+if (ShadingModels.HasShadingModel(MSM_SingleLayerWater) &amp;&amp; FDataDrivenShaderPlatformInfo::GetRequiresDisableForwardLocalLights(Platform))
+{
+    OutEnvironment.SetDefine(TEXT(&quot;DISABLE_FORWARD_LOCAL_LIGHTS&quot;), TEXT(&quot;1&quot;));
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br></div></div><div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShaderMaterial.h
+struct FShaderMaterialPropertyDefines
+{
+	//DECLARE_TYPE_LAYOUT(FShaderMaterialPropertyDefines, NonVirtual);
+
+	//void ModifyEnvironment(FShaderCompilerEnvironment&amp; OutEnvironment) const;
+	//void WriteFrozenVertexFactoryParameters(FMemoryImageWriter&amp; Writer, const TMemoryImagePtr&lt;FShaderMaterialPropertyDefines&gt;&amp; InPropDefines) const;
+
+	uint8 MATERIAL_ENABLE_TRANSLUCENCY_FOGGING : 1;
+
+	uint8 MATERIALBLENDING_ANY_TRANSLUCENT : 1;
+	uint8 MATERIAL_USES_SCENE_COLOR_COPY : 1;
+	uint8 MATERIALBLENDING_MASKED_USING_COVERAGE : 1;
+
+	uint8 MATERIAL_COMPUTE_FOG_PER_PIXEL : 1;
+	uint8 MATERIAL_SHADINGMODEL_UNLIT : 1;
+
+	uint8 MATERIAL_SHADINGMODEL_DEFAULT_LIT : 1;
+	uint8 MATERIAL_SHADINGMODEL_SUBSURFACE : 1;
+	uint8 MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN : 1;
+	uint8 MATERIAL_SHADINGMODEL_SUBSURFACE_PROFILE : 1;
+	uint8 MATERIAL_SHADINGMODEL_CLEAR_COAT : 1;
+	uint8 MATERIAL_SHADINGMODEL_TWOSIDED_FOLIAGE : 1;
+	uint8 MATERIAL_SHADINGMODEL_HAIR : 1;
+	uint8 MATERIAL_SHADINGMODEL_CLOTH : 1;
+	uint8 MATERIAL_SHADINGMODEL_EYE : 1;
+	uint8 MATERIAL_SHADINGMODEL_SINGLELAYERWATER : 1;
+	uint8 SINGLE_LAYER_WATER_SEPARATED_MAIN_LIGHT : 1;
+	uint8 MATERIAL_SHADINGMODEL_THIN_TRANSLUCENT : 1;
+
+	uint8 MATERIAL_SHADINGMODEL_TOON : 1;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br></div></div><p>添加Shader生成代码</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShaderGenerationUtil.cpp
+void FShaderCompileUtilities::ApplyFetchEnvironment(FShaderMaterialPropertyDefines&amp; SrcDefines, FShaderCompilerEnvironment&amp; OutEnvironment)
+{
+	FETCH_COMPILE_BOOL(MATERIAL_ENABLE_TRANSLUCENCY_FOGGING);
+	FETCH_COMPILE_BOOL(MATERIALBLENDING_ANY_TRANSLUCENT);
+	FETCH_COMPILE_BOOL(MATERIAL_USES_SCENE_COLOR_COPY);
+	FETCH_COMPILE_BOOL(MATERIALBLENDING_MASKED_USING_COVERAGE);
+
+	FETCH_COMPILE_BOOL(MATERIAL_COMPUTE_FOG_PER_PIXEL);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_UNLIT);
+
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_DEFAULT_LIT);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_SUBSURFACE);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_SUBSURFACE_PROFILE);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_CLEAR_COAT);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TWOSIDED_FOLIAGE);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_HAIR);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_CLOTH);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_EYE);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_SINGLELAYERWATER);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_THIN_TRANSLUCENT);
+
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TOON);
+
+	FETCH_COMPILE_BOOL(SINGLE_LAYER_WATER_SEPARATED_MAIN_LIGHT);
+
+	FETCH_COMPILE_BOOL(MATERIAL_FULLY_ROUGH);
+
+	FETCH_COMPILE_BOOL(USES_EMISSIVE_COLOR);
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br></div></div><p>如果我们的Shader Model需要使用额外的的数据，也可以将这些参数通过CustomData进行传入，同时修改材质节点的引脚</p> <p>在该Shading Model下激活Custom引脚</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//Material.cpp
+case MP_Normal:
+    Active = (ShadingModels.IsLit() &amp;&amp; (!bIsTranslucentBlendMode || !bIsNonDirectionalTranslucencyLightingMode)) || bUsesDistortion;
+    break;
+case MP_Tangent:
+    Active = ShadingModels.HasAnyShadingModel({ MSM_DefaultLit, MSM_ClearCoat }) &amp;&amp; (!bIsTranslucentBlendMode || !bIsVolumetricTranslucencyLightingMode);
+    break;
+case MP_SubsurfaceColor:
+    Active = ShadingModels.HasAnyShadingModel({ MSM_Subsurface, MSM_PreintegratedSkin, MSM_TwoSidedFoliage, MSM_Cloth });
+    break;
+case MP_CustomData0:
+    Active = ShadingModels.HasAnyShadingModel({ MSM_ClearCoat, MSM_Hair, MSM_Cloth, MSM_Eye, MSM_SubsurfaceProfile, MSM_Toon });
+    break;
+case MP_CustomData1:
+    Active = ShadingModels.HasAnyShadingModel({ MSM_ClearCoat, MSM_Eye, MSM_Toon });
+    break;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br></div></div><p>增加新的引脚，这段代码原本是放在MaterialShared.cpp文件下，但是目前主开发分支最新的版本已经把这些都移到了MaterialAttributeDefinitionMap.cpp下面（导致我合代码时不注意，导致疯狂报重定义编译失败）</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//MaterialShared.cpp/MaterialAttributeDefinitionMap.cpp
+case MP_CustomData0:	
+    CustomPinNames.Add({ MSM_ClearCoat, &quot;Clear Coat&quot; });
+    CustomPinNames.Add({MSM_Hair, &quot;Backlit&quot;});
+    CustomPinNames.Add({MSM_Cloth, &quot;Cloth&quot;});
+    CustomPinNames.Add({MSM_Eye, &quot;Iris Mask&quot;});
+    CustomPinNames.Add({MSM_SubsurfaceProfile, &quot;Curvature&quot; });
+
+    CustomPinNames.Add({ MSM_Toon, &quot;Specular Range&quot; });
+    return FText::FromString(GetPinNameFromShadingModelField(Material-&gt;GetShadingModels(), CustomPinNames, &quot;Custom Data 0&quot;));
+case MP_CustomData1:
+    CustomPinNames.Add({ MSM_ClearCoat, &quot;Clear Coat Roughness&quot; });
+    CustomPinNames.Add({MSM_Eye, &quot;Iris Distance&quot;});
+  
+    CustomPinNames.Add({ MSM_Toon, &quot;Offset&quot; });
+    return FText::FromString(GetPinNameFromShadingModelField(Material-&gt;GetShadingModels(), CustomPinNames, &quot;Custom Data 1&quot;));
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br></div></div><p>将CustomData写入GBuffer</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShaderGenerationUtil.cpp
+if (Mat.MATERIAL_SHADINGMODEL_EYE)
+{
+    SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+    Slots[GBS_CustomData] = bUseCustomData;
+}
+
+if (Mat.MATERIAL_SHADINGMODEL_SINGLELAYERWATER)
+{
+    // single layer water uses standard slots
+    SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+    if (Mat.SINGLE_LAYER_WATER_SEPARATED_MAIN_LIGHT)
+    {
+        Slots[GBS_SeparatedMainDirLight] = true;
+    }
+}
+
+// doesn't write to GBuffer
+if (Mat.MATERIAL_SHADINGMODEL_THIN_TRANSLUCENT)
+{
+}
+if (Mat.MATERIAL_SHADINGMODEL_TOON)
+{
+    SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+    Slots[GBS_CustomData] = bUseCustomData;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br></div></div><div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShaderMaterialDerivedHelpers.cpp
+Dst.NEEDS_LIGHTMAP = (Dst.NEEDS_LIGHTMAP_COORDINATE) &amp;&amp; !Lightmap.PRECOMPUTED_IRRADIANCE_VOLUME_LIGHTING;
+
+Dst.USES_GBUFFER = (FEATURE_LEVEL &gt;= ERHIFeatureLevel::SM4_REMOVED &amp;&amp; (Mat.MATERIALBLENDING_SOLID || Mat.MATERIALBLENDING_MASKED) &amp;&amp; !SrcGlobal.FORWARD_SHADING);
+
+// Only some shader models actually need custom data.
+Dst.WRITES_CUSTOMDATA_TO_GBUFFER = (Dst.USES_GBUFFER &amp;&amp; (Mat.MATERIAL_SHADINGMODEL_SUBSURFACE || Mat.MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN || Mat.MATERIAL_SHADINGMODEL_SUBSURFACE_PROFILE || Mat.MATERIAL_SHADINGMODEL_CLEAR_COAT || Mat.MATERIAL_SHADINGMODEL_TWOSIDED_FOLIAGE || Mat.MATERIAL_SHADINGMODEL_HAIR || Mat.MATERIAL_SHADINGMODEL_CLOTH || Mat.MATERIAL_SHADINGMODEL_EYE || Mat.MATERIAL_SHADINGMODEL_TOON));
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>那么C++部分的改动到此基本就结束了，从结果来看，我们在材质编辑器中增加了一个Shading Model的选项，同时在选中这个Shading Model的时候，会出现两个自定义的引脚，这两个引脚会通过CustomData把参数传到Shader当中供我们在计算时候使用。</p> <p>接下来时Shader的部分，首先同样是照葫芦画瓢，我们可以通过全局搜索其他Shading Model的名称，把一些定义先加上</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//Definitions.usf
+#if STRATA_NORMAL_QUALITY==0
+#define STRATA_TOP_LAYER_TYPE uint
+#elif STRATA_NORMAL_QUALITY==1
+#define STRATA_TOP_LAYER_TYPE uint2
+#else
+#error Uknown STRATA_NORMAL_QUALITY
+#endif
+
+#ifndef MATERIAL_SHADINGMODEL_DEFAULT_LIT
+#define MATERIAL_SHADINGMODEL_DEFAULT_LIT				0
+#endif
+
+#ifndef MATERIAL_SHADINGMODEL_TOON
+#define MATERIAL_SHADINGMODEL_TOON						0
+#endif
+
+#ifndef MATERIAL_SHADINGMODEL_SUBSURFACE
+#define MATERIAL_SHADINGMODEL_SUBSURFACE				0
+#endif
+
+#ifndef MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN
+#define MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN		0
+#endif
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br></div></div><p>添加Shading Model ID，同时定义在View中Debug的颜色</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShadingCommon.ush
+// SHADINGMODELID_* occupy the 4 low bits of an 8bit channel and SKIP_* occupy the 4 high bits
+#define SHADINGMODELID_UNLIT				0
+#define SHADINGMODELID_DEFAULT_LIT			1
+#define SHADINGMODELID_SUBSURFACE			2
+#define SHADINGMODELID_PREINTEGRATED_SKIN	3
+#define SHADINGMODELID_CLEAR_COAT			4
+#define SHADINGMODELID_SUBSURFACE_PROFILE	5
+#define SHADINGMODELID_TWOSIDED_FOLIAGE		6
+#define SHADINGMODELID_HAIR					7
+#define SHADINGMODELID_CLOTH				8
+#define SHADINGMODELID_EYE					9
+#define SHADINGMODELID_SINGLELAYERWATER		10
+#define SHADINGMODELID_THIN_TRANSLUCENT		11
+#define SHADINGMODELID_STRATA				12		// Temporary while we convert everything to Strata
+#define SHADINGMODELID_TOON					13
+#define SHADINGMODELID_NUM					14
+#define SHADINGMODELID_MASK					0xF		// 4 bits reserved for ShadingModelID			
+
+// The flags are defined so that 0 value has no effect!
+// These occupy the 4 high bits in the same channel as the SHADINGMODELID_*
+#define HAS_ANISOTROPY_MASK				(1 &lt;&lt; 4)
+#define SKIP_PRECSHADOW_MASK			(1 &lt;&lt; 5)
+#define ZERO_PRECSHADOW_MASK			(1 &lt;&lt; 6)
+#define SKIP_VELOCITY_MASK				(1 &lt;&lt; 7)
+
+#define SSS_PROFILE_ID_INVALID  256
+#define SSS_PROFILE_ID_PERPIXEL 512
+
+// for debugging and to visualize
+float3 GetShadingModelColor(uint ShadingModelID)
+{
+	// TODO: PS4 doesn't optimize out correctly the switch(), so it thinks it needs all the Samplers even if they get compiled out
+	//	This will get fixed after launch per Sony...
+#if PS4_PROFILE
+		 if (ShadingModelID == SHADINGMODELID_UNLIT) return float3(0.1f, 0.1f, 0.2f); // Dark Blue
+	else if (ShadingModelID == SHADINGMODELID_DEFAULT_LIT) return float3(0.1f, 1.0f, 0.1f); // Green
+	else if (ShadingModelID == SHADINGMODELID_SUBSURFACE) return float3(1.0f, 0.1f, 0.1f); // Red
+	else if (ShadingModelID == SHADINGMODELID_PREINTEGRATED_SKIN) return float3(0.6f, 0.4f, 0.1f); // Brown
+	else if (ShadingModelID == SHADINGMODELID_CLEAR_COAT) return float3(0.1f, 0.4f, 0.4f); 
+	else if (ShadingModelID == SHADINGMODELID_SUBSURFACE_PROFILE) return float3(0.2f, 0.6f, 0.5f); // Cyan
+	else if (ShadingModelID == SHADINGMODELID_TWOSIDED_FOLIAGE) return float3(0.2f, 0.2f, 0.8f); // Blue
+	else if (ShadingModelID == SHADINGMODELID_HAIR) return float3(0.6f, 0.1f, 0.5f);
+	else if (ShadingModelID == SHADINGMODELID_CLOTH) return float3(0.7f, 1.0f, 1.0f); 
+	else if (ShadingModelID == SHADINGMODELID_EYE) return float3(0.3f, 1.0f, 1.0f); 
+	else if (ShadingModelID == SHADINGMODELID_SINGLELAYERWATER) return float3(0.5f, 0.5f, 1.0f);
+	else if (ShadingModelID == SHADINGMODELID_THIN_TRANSLUCENT) return float3(1.0f, 0.8f, 0.3f);
+	else if (ShadingModelID == SHADINGMODELID_STRATA) return float3(1.0f, 1.0f, 0.0f);
+	else if (ShadingModelID == SHADINGMODELID_TOON) return float3(0.75f, 0.1f, 0.1f);
+	else return float3(1.0f, 1.0f, 1.0f); // White
+#else
+	switch(ShadingModelID)
+	{
+		case SHADINGMODELID_UNLIT: return float3(0.1f, 0.1f, 0.2f); // Dark Blue
+		case SHADINGMODELID_DEFAULT_LIT: return float3(0.1f, 1.0f, 0.1f); // Green
+		case SHADINGMODELID_SUBSURFACE: return float3(1.0f, 0.1f, 0.1f); // Red
+		case SHADINGMODELID_PREINTEGRATED_SKIN: return float3(0.6f, 0.4f, 0.1f); // Brown
+		case SHADINGMODELID_CLEAR_COAT: return float3(0.1f, 0.4f, 0.4f); // Brown
+		case SHADINGMODELID_SUBSURFACE_PROFILE: return float3(0.2f, 0.6f, 0.5f); // Cyan
+		case SHADINGMODELID_TWOSIDED_FOLIAGE: return float3(0.2f, 0.2f, 0.8f); // Cyan
+		case SHADINGMODELID_HAIR: return float3(0.6f, 0.1f, 0.5f);
+		case SHADINGMODELID_CLOTH: return float3(0.7f, 1.0f, 1.0f);
+		case SHADINGMODELID_EYE: return float3(0.3f, 1.0f, 1.0f);
+		case SHADINGMODELID_SINGLELAYERWATER: return float3(0.5f, 0.5f, 1.0f);
+		case SHADINGMODELID_THIN_TRANSLUCENT: return float3(1.0f, 0.8f, 0.3f);
+		case SHADINGMODELID_STRATA: return float3(1.0f, 1.0f, 0.0f);
+		case SHADINGMODELID_TOON: return float3(0.75f, 0.75f, 0.1f);
+		default: return float3(1.0f, 1.0f, 1.0f); // White
+	}
+#endif
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br></div></div><p>判断是否有写入CustomData</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//DeferredShadingCommon.ush
+bool HasCustomGBufferData(int ShadingModelID)
+{
+	return ShadingModelID == SHADINGMODELID_SUBSURFACE
+		|| ShadingModelID == SHADINGMODELID_PREINTEGRATED_SKIN
+		|| ShadingModelID == SHADINGMODELID_CLEAR_COAT
+		|| ShadingModelID == SHADINGMODELID_SUBSURFACE_PROFILE
+		|| ShadingModelID == SHADINGMODELID_TWOSIDED_FOLIAGE
+		|| ShadingModelID == SHADINGMODELID_HAIR
+		|| ShadingModelID == SHADINGMODELID_CLOTH
+		|| ShadingModelID == SHADINGMODELID_EYE
+		|| ShadingModelID == SHADINGMODELID_TOON;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>定义写入将CustomData写入GBuffer</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//BasePassCommon.ush
+#define NEEDS_LIGHTMAP						(NEEDS_LIGHTMAP_COORDINATE)
+
+#define USES_GBUFFER						(FEATURE_LEVEL &gt;= FEATURE_LEVEL_SM4 &amp;&amp; (MATERIALBLENDING_SOLID || MATERIALBLENDING_MASKED) &amp;&amp; !FORWARD_SHADING)
+
+// Only some shader models actually need custom data.
+#define WRITES_CUSTOMDATA_TO_GBUFFER		(USES_GBUFFER &amp;&amp; (MATERIAL_SHADINGMODEL_SUBSURFACE || MATERIAL_SHADINGMODEL_PREINTEGRATED_SKIN || MATERIAL_SHADINGMODEL_SUBSURFACE_PROFILE || MATERIAL_SHADINGMODEL_CLEAR_COAT || MATERIAL_SHADINGMODEL_TWOSIDED_FOLIAGE || MATERIAL_SHADINGMODEL_HAIR || MATERIAL_SHADINGMODEL_CLOTH || MATERIAL_SHADINGMODEL_EYE || MATERIAL_SHADINGMODEL_TOON))
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>将CustomData写入GBuffer</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShadingModelsMaterial.ush
+#if MATERIAL_SHADINGMODEL_EYE
+	else if (ShadingModel == SHADINGMODELID_EYE)
+	{
+		const float IrisMask     = saturate(GetMaterialCustomData0(MaterialParameters));
+		const float IrisDistance = saturate(GetMaterialCustomData1(MaterialParameters));
+
+		GBuffer.CustomData.x = EncodeSubsurfaceProfile(SubsurfaceProfile).x;
+		GBuffer.CustomData.w = 1.0f - IrisMask;	// Opacity
+
+	#if IRIS_NORMAL
+		float2 WorldNormalOct = UnitVectorToOctahedron( GBuffer.WorldNormal );
+
+		// CausticNormal stored as octahedron
+		#if NUM_MATERIAL_OUTPUTS_GETTANGENTOUTPUT &gt; 0
+			// Blend in the negative intersection normal to create some concavity
+			// Not great as it ties the concavity to the convexity of the cornea surface
+			// No good justification for that. On the other hand, if we're just looking to
+			// introduce some concavity, this does the job.
+			float3 PlaneNormal = normalize( GetTangentOutput0(MaterialParameters) );
+			float3 CausticNormal = normalize( lerp( PlaneNormal, -GBuffer.WorldNormal, IrisMask*IrisDistance ) );
+			float2 CausticNormalOct  = UnitVectorToOctahedron( CausticNormal );
+			float2 CausticNormalDelta = ( CausticNormalOct - WorldNormalOct ) * 0.5 + (128.0/255.0);
+			GBuffer.Metallic = CausticNormalDelta.x;
+			GBuffer.Specular = CausticNormalDelta.y;
+		#else
+			float3 PlaneNormal = GBuffer.WorldNormal;
+			GBuffer.Metallic = 128.0/255.0;
+			GBuffer.Specular = 128.0/255.0;
+		#endif
+
+		// IrisNormal CustomData.yz
+		#if NUM_MATERIAL_OUTPUTS_CLEARCOATBOTTOMNORMAL &gt; 0
+			float3 IrisNormal = normalize( ClearCoatBottomNormal0(MaterialParameters) );
+			#if MATERIAL_TANGENTSPACENORMAL
+				IrisNormal = normalize( TransformTangentVectorToWorld( MaterialParameters.TangentToWorld, IrisNormal ) );
+			#endif
+		#else
+			float3 IrisNormal = PlaneNormal;
+		#endif
+
+		float2 IrisNormalOct  = UnitVectorToOctahedron( IrisNormal );
+		float2 IrisNormalDelta = ( IrisNormalOct - WorldNormalOct ) * 0.5 + (128.0/255.0);
+		GBuffer.CustomData.yz = IrisNormalDelta;
+	#else
+		GBuffer.Metallic = IrisDistance;
+
+		#if NUM_MATERIAL_OUTPUTS_GETTANGENTOUTPUT &gt; 0
+			float3 Tangent = GetTangentOutput0(MaterialParameters);
+			GBuffer.CustomData.yz = UnitVectorToOctahedron( normalize(Tangent) ) * 0.5 + 0.5;
+		#endif
+	#endif
+
+	#if SHADING_PATH_MOBILE
+		#if MATERIAL_SHADINGMODEL_EYE_USE_CURVATURE
+			GBuffer.Curvature = Metallic;
+		#else
+			GBuffer.Curvature = CalculateCurvature(GBuffer.WorldNormal, MaterialParameters.WorldPosition_CamRelative);
+		#endif
+
+		GBuffer.Curvature = clamp(GBuffer.Curvature, 0.001f, 1.0f);
+	#endif
+	}
+#endif
+
+#if MATERIAL_SHADINGMODEL_TOON
+	else if (ShadingModel == SHADINGMODELID_TOON)
+	{
+		GBuffer.CustomData.x = saturate( GetMaterialCustomData0(MaterialParameters) );
+		GBuffer.CustomData.y = saturate( GetMaterialCustomData1(MaterialParameters) );
+	}
+#endif
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br></div></div><p>做完了以上工作，接下来是真正对光照计算和光照模型进行修改的地方，后续对效果的调试也主要集中在这里</p> <p>根据ShadingModelID选择BxDF</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ShadingModels.ush
+FDirectLighting IntegrateBxDF( FGBufferData GBuffer, half3 N, half3 V, half3 L, float Falloff, half NoL, FAreaLight AreaLight, FShadowTerms Shadow )
+{
+	switch( GBuffer.ShadingModelID )
+	{
+		case SHADINGMODELID_DEFAULT_LIT:
+		case SHADINGMODELID_SINGLELAYERWATER:
+		case SHADINGMODELID_THIN_TRANSLUCENT:
+			return DefaultLitBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_SUBSURFACE:
+			return SubsurfaceBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_PREINTEGRATED_SKIN:
+			return PreintegratedSkinBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_CLEAR_COAT:
+			return ClearCoatBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_SUBSURFACE_PROFILE:
+			return SubsurfaceProfileBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_TWOSIDED_FOLIAGE:
+			return TwoSidedBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_HAIR:
+			return HairBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_CLOTH:
+			return ClothBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_EYE:
+			return EyeBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		case SHADINGMODELID_TOON:
+			return ToonBxDF( GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow );
+		default:
+			return (FDirectLighting)0;
+	}
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br></div></div><p>定义BxDF</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>FDirectLighting ToonBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float Falloff, float NoL, FAreaLight AreaLight, FShadowTerms Shadow)
+{
+#if GBUFFER_HAS_TANGENT
+	half3 X = GBuffer.WorldTangent;
+	half3 Y = normalize(cross(N, X));
+#else
+	half3 X = 0;
+	half3 Y = 0;
+#endif
+	
+	BxDFContext Context;
+	Init(Context, N, X, Y, V, L);
+	SphereMaxNoH(Context, AreaLight.SphereSinAlpha, true);
+	Context.NoV = saturate(abs(Context.NoV) + 1e-5);
+
+	float SpecularOffset = 0.5;
+	float SpecularRange = GBuffer.CustomData.x;
+
+	float3 ShadowColor = 0;
+	
+	ShadowColor = GBuffer.DiffuseColor * ShadowColor;
+	float offset = GBuffer.CustomData.y;
+	float SoftScatterStrength = 0;
+
+	offset = offset * 2 - 1;
+	half3 H = normalize(V + L);
+	float NoH = saturate(dot(N, H));
+	NoL = (dot(N, L) + 1) / 2; // overwrite NoL to get more range out of it
+	half NoLOffset = saturate(NoL + offset);
+	
+	FDirectLighting Lighting;
+	Lighting.Diffuse = AreaLight.FalloffColor * (smoothstep(0, 1, NoLOffset) * Falloff) * Diffuse_Lambert(GBuffer.DiffuseColor) * 2.2;
+
+	float InScatter = pow(saturate(dot(L, -V)), 12) * lerp(3, .1f, 1);
+	float NormalContribution = saturate(dot(N, H));
+	float BackScatter = GBuffer.GBufferAO * NormalContribution / (PI * 2);
+
+	Lighting.Specular = ToonStep(SpecularRange, (saturate(D_GGX(SpecularOffset, NoH)))) * (AreaLight.FalloffColor * GBuffer.SpecularColor * Falloff * 8);
+
+	float3 TransmissionSoft = AreaLight.FalloffColor * (Falloff * lerp(BackScatter, 1, InScatter)) * ShadowColor * SoftScatterStrength;
+	float3 ShadowLightener = (saturate(smoothstep(0, 1, saturate(1 - NoLOffset))) * ShadowColor * 0.1);
+	
+	Lighting.Transmission = (ShadowLightener + TransmissionSoft) * Falloff;
+	return Lighting;
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br></div></div><p>更改光照的计算，主要为了实现卡通渲染的梯度衰减光照</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//DeferredLightingCommon.ush
+BRANCH
+	if( LightMask &gt; 0 )
+	{
+		FShadowTerms Shadow;
+		Shadow.SurfaceShadow = AmbientOcclusion;
+		Shadow.TransmissionShadow = 1;
+		Shadow.TransmissionThickness = 1;
+		Shadow.HairTransmittance.OpaqueVisibility = 1;
+		const float ContactShadowOpacity = GBuffer.CustomData.a;
+		GetShadowTerms(GBuffer.Depth, GBuffer.PrecomputedShadowFactors, GBuffer.ShadingModelID, ContactShadowOpacity,
+			LightData, TranslatedWorldPosition, L, LightAttenuation, Dither, Shadow);
+		SurfaceShadow = Shadow.SurfaceShadow;
+
+		LightAccumulator.EstimatedCost += 0.3f;		// add the cost of getting the shadow terms
+		
+		float3 Attenuation = 1;
+		BRANCH
+		if (GBuffer.ShadingModelID == SHADINGMODELID_TOON)
+		{
+			float offset = GBuffer.CustomData.y;
+			float TerminatorRange = saturate(GBuffer.Roughness - 0.5);
+				
+			offset = offset * 2 - 1;
+				
+			BRANCH
+			if (offset &gt;= 1)
+			{
+				Attenuation = 1;
+			}
+			else
+			{
+				float NoL = (dot(N, L) + 1) / 2;
+				float NoLOffset = saturate(NoL + offset);
+				float LightAttenuationOffset = saturate( Shadow.SurfaceShadow + offset);
+				float ToonSurfaceShadow = smoothstep(0.5 - TerminatorRange, 0.5 + TerminatorRange, LightAttenuationOffset);
+
+				Attenuation = smoothstep(0.5 - TerminatorRange, 0.5 + TerminatorRange, NoLOffset) * ToonSurfaceShadow;
+			}
+		}
+
+
+#if SHADING_PATH_MOBILE
+		const bool bNeedsSeparateSubsurfaceLightAccumulation = UseSubsurfaceProfile(GBuffer.ShadingModelID);
+		
+		FDirectLighting Lighting = (FDirectLighting)0;
+
+		half NoL = max(0, dot(GBuffer.WorldNormal, L));
+	#if TRANSLUCENCY_NON_DIRECTIONAL
+		NoL = 1.0f;
+	#endif
+		Lighting = EvaluateBxDF(GBuffer, N, V, L, NoL, Shadow);
+
+		Lighting.Specular *= LightData.SpecularScale;
+	
+		LightAccumulator_AddSplit( LightAccumulator, Lighting.Diffuse, Lighting.Specular, Lighting.Diffuse, MaskedLightColor * Shadow.SurfaceShadow * Attenuation, bNeedsSeparateSubsurfaceLightAccumulation );
+		LightAccumulator_AddSplit( LightAccumulator, Lighting.Transmission, 0.0f, Lighting.Transmission, MaskedLightColor * Shadow.TransmissionShadow, bNeedsSeparateSubsurfaceLightAccumulation );
+#else // SHADING_PATH_MOBILE
+		BRANCH
+		if( Shadow.SurfaceShadow + Shadow.TransmissionShadow &gt; 0 )
+		{
+			const bool bNeedsSeparateSubsurfaceLightAccumulation = UseSubsurfaceProfile(GBuffer.ShadingModelID);
+
+		#if NON_DIRECTIONAL_DIRECT_LIGHTING
+			float Lighting;
+
+			if( LightData.bRectLight )
+			{
+				FRect Rect = GetRect( ToLight, LightData );
+
+				Lighting = IntegrateLight( Rect );
+			}
+			else
+			{
+				FCapsuleLight Capsule = GetCapsule( ToLight, LightData );
+
+				Lighting = IntegrateLight( Capsule, LightData.bInverseSquared );
+			}
+
+			float3 LightingDiffuse = Diffuse_Lambert( GBuffer.DiffuseColor ) * Lighting;
+
+			LightAccumulator_AddSplit(LightAccumulator, LightingDiffuse, 0.0f, 0, MaskedLightColor * Shadow.SurfaceShadow * Attenuation, bNeedsSeparateSubsurfaceLightAccumulation);
+		#else
+			FDirectLighting Lighting;
+
+			if (LightData.bRectLight)
+			{
+				FRect Rect = GetRect( ToLight, LightData );
+				const FRectTexture SourceTexture = ConvertToRectTexture(LightData);
+
+				#if REFERENCE_QUALITY
+					Lighting = IntegrateBxDF( GBuffer, N, V, Rect, Shadow, SourceTexture, SVPos );
+				#else
+					Lighting = IntegrateBxDF( GBuffer, N, V, Rect, Shadow, SourceTexture);
+				#endif
+			}
+			else
+			{
+				FCapsuleLight Capsule = GetCapsule( ToLight, LightData );
+
+				#if REFERENCE_QUALITY
+					Lighting = IntegrateBxDF( GBuffer, N, V, Capsule, Shadow, SVPos );
+				#else
+					Lighting = IntegrateBxDF( GBuffer, N, V, Capsule, Shadow, LightData.bInverseSquared );
+				#endif
+			}
+
+			Lighting.Specular *= LightData.SpecularScale;
+
+			LightAccumulator_AddSplit( LightAccumulator, Lighting.Diffuse, Lighting.Specular, Lighting.Diffuse, MaskedLightColor * Shadow.SurfaceShadow * Attenuation, bNeedsSeparateSubsurfaceLightAccumulation );
+			LightAccumulator_AddSplit( LightAccumulator, Lighting.Transmission, 0.0f, Lighting.Transmission, MaskedLightColor * Shadow.TransmissionShadow, bNeedsSeparateSubsurfaceLightAccumulation );
+
+			LightAccumulator.EstimatedCost += 0.4f;		// add the cost of the lighting computations (should sum up to 1 form one light)
+		#endif
+		}
+#endif // SHADING_PATH_MOBILE
+	}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br></div></div><p>同时新建了一个文件用来存放新的ShadingModel相关的自定义函数</p> <div class="language-C++ line-numbers-mode"><pre class="language-text"><code>//ToonShadingCommon.ush
+float3 ToonStep(float feather, float halfLambert, float threshold = 0.5f)
+{
+	return smoothstep(threshold - feather, threshold + feather, halfLambert);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>到这里应该算是已经大功告成了，已经可以在材质中连线，看到基本的卡通渲染的效果，只不过，这个效果依旧是远远不尽如人意的，如果想要做出自己心中的效果，还是得在这个框架的基础上，对光照计算改改改才行。上述的开发流程，以及光照计算的代码也参考了不少知乎上的文章，随便搜搜Shading Model的关键字就能搜到不少。而这篇文章的目的主要还是希望帮助刚开始对着代码着手开发的小伙伴，能够快速理清这整个流程和思路，以便在后续的开发中少踩一些坑。</p> <p>这篇就这样子吧，后续应该还会写写在描边开发的过程中踩的一些坑。</p></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/eukky/eukky.github.io/edit/dev/docs/GameDev/UnrealEngine/CustomShadingModel.md" target="_blank" rel="noopener noreferrer">Edit</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.0a53806a.js" defer></script><script src="/assets/js/2.e7ab5c73.js" defer></script><script src="/assets/js/1.924d8370.js" defer></script><script src="/assets/js/42.4b5d0a0f.js" defer></script>
+  </body>
+</html>
